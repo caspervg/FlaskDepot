@@ -1,7 +1,7 @@
 from flaskDepot import app, db
 from flaskDepot.models import User, Usergroup
 from flaskDepot.views.base import RedirectForm, get_redirect_target
-from flask import render_template, request, session, flash
+from flask import render_template, request, session, flash, jsonify
 from flask.ext.classy import FlaskView
 from flask_wtf import Form
 from wtforms import TextField, PasswordField
@@ -118,3 +118,19 @@ class LoginView(FlaskView):
             return render_template('login.html', form=form)
 
 LoginView.register(app)
+
+# User Profile
+class UserView(FlaskView):
+
+    def index(self):
+        users = User.query.all()
+        ret = ''
+        for user in users:
+            ret += '{0}<br>'.format(user.username)
+        return ret
+
+    def get(self, id):
+        user = User.query.filter(User.id == id).first()
+        return user.username
+
+UserView.register(app)
