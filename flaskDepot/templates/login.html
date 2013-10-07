@@ -1,0 +1,9 @@
+{% from "_form_helpers.html" import render_field %}
+<form method=post action="/login/">
+  <dl>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.password) }}
+  </dl>
+  <p><input type="submit" value="Log in">
+</form>

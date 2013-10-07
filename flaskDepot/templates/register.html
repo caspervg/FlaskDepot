@@ -1,0 +1,12 @@
+{% from "_form_helpers.html" import render_field %}
+<form method=post action="/register/">
+  <dl>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.confirm_email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm_password) }}
+  </dl>
+  <p><input type=submit value=Register>
+</form>
