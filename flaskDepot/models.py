@@ -4,14 +4,14 @@ import datetime
 
 
 class Config(db.Model):
-    __tablename__ = 'fD_config'
+    __tablename__ = 'fd_config'
 
     id = db.Column(db.Integer, primary_key=True)
     views = db.Column(db.Integer, default=0)
 
 
 class Usergroup(db.Model):
-    __tablename__ = 'fD_usergroups'
+    __tablename__ = 'fd_usergroups'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100))
@@ -34,12 +34,12 @@ class Usergroup(db.Model):
 
 
 class User(db.Model):
-    __tablename__ = 'fD_users'
+    __tablename__ = 'fd_users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Unicode(25), unique=True)
 
-    group_id = db.Column(db.Integer, db.ForeignKey('fD_usergroups.id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('fd_usergroups.id'), nullable=False)
 
     created_on = db.Column(db.DateTime, default=datetime.datetime.now)
     created_ip = db.Column(db.String(16))
@@ -48,8 +48,8 @@ class User(db.Model):
     last_active_ip = db.Column(db.String(16))
 
     files = db.relationship('File', backref='author', lazy='dynamic')
-    comments = db.relationship('Comment', backref='user_id', lazy='dynamic')
-    downloads = db.relationship('Download', backref='user_id', lazy='dynamic')
+    comments = db.relationship('Comment', backref='user', lazy='dynamic')
+    downloads = db.relationship('Download', backref='user', lazy='dynamic')
 
     email = db.Column(db.Unicode(100))
     password_hash = db.Column(db.String(60))
@@ -70,21 +70,21 @@ class User(db.Model):
 
 
 # (Narrow Category <-> Broad Category) Association
-broad_narrow_association = db.Table('fD_broad_narrow_assocation', db.Model.metadata,
-                                 db.Column('broad_id', db.Integer, db.ForeignKey('fD_broadcategories.id')),
-                                 db.Column('narrow_id', db.Integer, db.ForeignKey('fD_narrowcategories.id')))
+broad_narrow = db.Table('fd_broad_narrow', db.Model.metadata,
+                        db.Column('broad_id', db.Integer, db.ForeignKey('fd_broadcategories.id')),
+                        db.Column('narrow_id', db.Integer, db.ForeignKey('fd_narrowcategories.id')))
 
 
 class BroadCategory(db.Model):
-    __tablename__ = 'fD_broadcategories'
+    __tablename__ = 'fd_broadcategories'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100), unique=True)
 
     description = db.Column(db.UnicodeText)
 
-    narrow_categories = db.relationship('NarrowCategory', secondary=broad_narrow_association,
-                                        backref="broad_category")
+    narrow_categories = db.relationship('NarrowCategory', secondary=broad_narrow,
+                                        backref="broad_categories")
 
     @property
     def url(self):
@@ -92,7 +92,7 @@ class BroadCategory(db.Model):
 
 
 class NarrowCategory(db.Model):
-    __tablename__ = 'fD_narrowcategories'
+    __tablename__ = 'fd_narrowcategories'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100), unique=True)
@@ -105,7 +105,7 @@ class NarrowCategory(db.Model):
 
 
 class File(db.Model):
-    __tablename__ = 'fD_files'
+    __tablename__ = 'fd_files'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100), unique=True)
@@ -113,8 +113,7 @@ class File(db.Model):
     description = db.Column(db.UnicodeText)
     version = db.Column(db.Unicode(20))
 
-    creator_id = db.Column(db.Integer, db.ForeignKey('fD_users.id'), nullable=False)
-    creator = db.relationship('User', uselist=False, primaryjoin='File.creator_id == User.id')
+    author_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)
 
     is_locked = db.Column(db.Boolean, default=False)
     is_deleted = db.Column(db.Boolean, default=False)
@@ -129,8 +128,8 @@ class File(db.Model):
 
     dependencies = db.Column(db.UnicodeText)
 
-    comments = db.relationship('Comment', backref='file_id', lazy='dynamic')
-    downloads = db.relationship('Download', backref='file_id', lazy='dynamic')
+    comments = db.relationship('Comment', backref='file', lazy='dynamic')
+    downloads = db.relationship('Download', backref='file', lazy='dynamic')
 
     file_name = db.Column(db.String(50))
     preview1_name = db.Column(db.String(50))
@@ -164,22 +163,22 @@ class File(db.Model):
 
 
 class Comment(db.Model):
-    __tablename__ = 'fD_comments'
+    __tablename__ = 'fd_comments'
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.UnicodeText)
 
-    file = db.Column(db.Integer, db.ForeignKey('fD_files.id'), nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('fD_users.id'), nullable=False)
+    file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)
 
 
 class Download(db.Model):
-    __tablename__ = 'fD_downloads'
+    __tablename__ = 'fd_downloads'
 
     id = db.Column(db.Integer, primary_key=True)
 
-    file = db.Column(db.Integer, db.ForeignKey('fD_files.id'), nullable=False)
-    user = db.Column(db.Integer, db.ForeignKey('fD_users.id'), nullable=False)
+    file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)
 
     num_downloaded = db.Column(db.Integer)
     last_downloaded = db.Column(db.DateTime)

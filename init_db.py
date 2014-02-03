@@ -35,16 +35,16 @@ db.session.add(narrwcat)
 
 db.session.commit()
 
-file = File(name=u'TestFile', description=u'A test file', version=u'1.0', creator=user_2,
+file = File(name=u'TestFile', description=u'A test file', version=u'1.0', author=user_2,
             num_views=3, file_name='MyTestFile.zip', preview1_name='MyPrev.png', preview2_name='MyPrev.gif')
 db.session.add(file)
 
 db.session.commit()
 
-comment = Comment(text=u'Some nice comment text. We love you!', file_id=file, user_id=user_1)
+comment = Comment(text=u'Some nice comment text. We love you!', file=file, user=user_1)
 db.session.add(comment)
 
-dl_1 = Download(last_downloaded=datetime.datetime.utcnow(), file_id=file, user_id=user_1)
-dl_2 = Download(last_downloaded=datetime.datetime.utcnow(), file_id=file, user_id=user_2)
+dl_1 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_1)
+dl_2 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_2)
 
 db.session.commit()
