@@ -1,6 +1,7 @@
 from datetime import datetime
 import hashlib
 import os
+from flask.ext.login import current_user, login_required
 from werkzeug.debug.repr import dump
 from werkzeug.utils import secure_filename
 from flaskdepot import app, db
@@ -51,11 +52,26 @@ class UploadForm(Form):
                 other_file = File.query.filter_by(name=self.filename.data).first()
                 if other_file:
                     self.filename.errors.append('A file with this name already exists.')
-                    return False
+                    validate = False
+
+            if self.package.data:
+                other_file = File.query.filter_by(file_name=secure_filename(self.package.data.filename)).first()
+                if other_file:
+                    self.package.errors.append('A package (.zip, .rar) with this name already exists.')
+                    validate = False
+
+            for i_file in [self.image_1.data, self.image_2.data]:
+                if file is not None:
+                    o_file1 = File.query.filter_by(preview1_name=secure_filename(i_file.filename)).first()
+                    o_file2 = File.query.filter_by(preview2_name=secure_filename(i_file.filename)).first()
+                    if o_file1 or o_file2:
+                        i_file.errors.append('A preview image with this name already exists.')
+                        validate = False
 
             return validate
 
 
+@login_required
 @app.route('/upload/', methods=['GET', 'POST'])
 def upload():
     form = UploadForm()
@@ -72,12 +88,22 @@ def upload():
         new_file.version = form.version.data
         new_file.broad_category = form.broad_category.data
         new_file.narrow_category = form.narrow_category.data
-        db.session.add(new_file)
-        #db.session.commit(new_file)
-        package = form.package.data
-        package.save(os.path.join(app.config['FILE_DIR'], secure_filename(form.package.data.filename)))
-        flash('uploading succeeded')
-        return 'juj'
+        new_file.author_id = current_user.id
 
+        package = form.package.data
+        package.save(os.path.join(app.config['FILE_DIR'], secure_filename(package.filename)))
+
+        prev1 = form.image_1.data
+        prev1.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev1.filename)))
+
+        if form.image_2.data.filename is not None:
+            prev2 = form.image_2.data
+            prev2.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev2.filename)))
+
+        db.session.add(new_file)
+        db.session.commit()
+
+        flash('uploading succeeded')
+        return "ok"
 
     return render_template('upload.html', form=form)
