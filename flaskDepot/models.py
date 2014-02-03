@@ -1,4 +1,4 @@
-from flaskdepot import db, usergroup_cache, url_for
+from flaskdepot import db, usergroup_cache
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
@@ -67,6 +67,18 @@ class User(db.Model):
     @property
     def cached_group(self):
         return Usergroup.get_cached(self.group_id)
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return self.id
 
 
 # (Narrow Category <-> Broad Category) Association
@@ -138,16 +150,6 @@ class File(db.Model):
     @property
     def url(self):
         return u'/file/{0}'.format(self.id)
-
-    @property
-    def edit_url(self):
-        return url_for('edit_file',
-                       thread_id=self.id)
-
-    @property
-    def delete_url(self):
-        return url_for('delete_file',
-                       thread_id=self.id)
 
     def can_be_edited_by(self, user):
         if user.is_admin:

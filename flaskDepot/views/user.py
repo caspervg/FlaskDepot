@@ -1,18 +1,20 @@
+from wtforms.fields.html5 import EmailField
 from flaskdepot import app, db
 from flaskdepot.models import User, Usergroup
 from flaskdepot.views.base import RedirectForm, get_redirect_target
 from flask import render_template, request, session, flash, jsonify
 from flask.ext.classy import FlaskView
 from flask_wtf import Form
+from flask_login import login_user, login_required
 from wtforms import TextField, PasswordField
 from wtforms.validators import Required, Length, EqualTo, Email
-
+from flask.ext import login
 
 # User Registration
 class RegistrationForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
 
-    email = TextField('E-mail', validators=[Required(), Email()])
+    email = EmailField('E-mail', validators=[Required(), Email()])
     confirm_email = TextField('Confirm E-mail', validators=[
         Required(),
         EqualTo('email', message="The two e-mails you entered must match")
@@ -61,7 +63,7 @@ class RegisterView(FlaskView):
             db.session.add(user)
             db.session.commit()
 
-            session['user_id'] = user.id
+            login_user(user)
             flash(u'Thank you for signing up! You are now logged in as {0}'.format(user.username))
 
             return form.redirect()
@@ -90,11 +92,11 @@ class LoginForm(RedirectForm):
             user = User.query.filter(db.func.lower(User.username) == db.func.lower(self.username.data)).first()
             if not user:
                 self.username.errors.append('No user with that username exists.'
-                                            ' Make sure that you have typed it correctly')
+                                            ' Make sure that you have typed it correctly.')
                 return False
             if not user.check_password(self.password.data):
                 self.password.errors.append('The password you have used is incorrect.'
-                                            ' Make sure that you have typed it correctly')
+                                            ' Make sure that you have typed it correctly.')
                 return False
 
             self.user = user
@@ -111,13 +113,22 @@ class LoginView(FlaskView):
         form = LoginForm()
 
         if form.validate_on_submit():
-            session['user_id'] = form.user.id
+            login_user(form.user);
             flash(u'You have been logged in as {0}'.format(form.user.username))
             return form.redirect('/')
         else:
             return render_template('login.html', form=form)
 
 LoginView.register(app)
+
+def init_login():
+    login_manager = login.LoginManager()
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return db.session.query(User).get(user_id)
+init_login()
 
 # User Profile
 class UserView(FlaskView):
@@ -129,6 +140,7 @@ class UserView(FlaskView):
             ret += '{0}<br>'.format(user.username)
         return ret
 
+    @login_required
     def get(self, id):
         user = User.query.filter(User.id == id).first()
         return user.username

@@ -1,0 +1,24 @@
+{% from "_form_helpers.html" import render_field %}
+<form method=post action="/upload/" enctype="multipart/form-data">
+  <dl>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.filename) }}
+    {{ render_field(form.package) }}
+    {{ render_field(form.image_1) }}
+    {{ render_field(form.image_2) }}
+    {{ render_field(form.version) }}
+    {{ render_field(form.description) }}
+    {{ render_field(form.broad_category) }}
+    {{ render_field(form.narrow_category) }}
+  </dl>
+  <p><input type=submit value=Upload>
+</form>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul class=flashes>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}

@@ -1,5 +1,3 @@
-from flaskdepot import app
-from flaskdepot.models import *
 from flask import request, redirect, url_for, render_template
 from flask_wtf import Form
 from wtforms import HiddenField

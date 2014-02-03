@@ -32,10 +32,10 @@ CURRENT_DIR = os.path.dirname(__file__)
 # Settings for uploaded files
 FILE_DIR = os.path.normpath(CURRENT_DIR + '/data/files')
 FILE_MAX_FILESIZE = 30 * 1024 * 1024  # 30 MB
-FILE_EXTENSIONS = set('zip rar'.split(' '))
+FILE_EXTENSIONS = ['zip', 'rar']
 
 # Settings for uploaded preview images
 PREVIEW_DIR = os.path.normpath(CURRENT_DIR + '/data/images')
 PREVIEW_MAX_FILESIZE = 1 * 1024 * 1024  # 1 MB
 PREVIEW_MAX_IMGSIZE  = (250, 188)  # (width, height)
-PREVIEW_EXTENSIONS = set('png jpg gif'.split(' '))
+PREVIEW_EXTENSIONS = ['png', 'jpg', 'gif']

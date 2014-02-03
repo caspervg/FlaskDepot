@@ -1,4 +1,4 @@
-from flask import Flask, url_for
+from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import SimpleCache
 from config import *
@@ -17,3 +17,5 @@ db = SQLAlchemy(app, session_options=dict(expire_on_commit=False))
 
 import views.base
 import views.user
+import views.file
+
