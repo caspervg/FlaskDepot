@@ -2,3 +2,4 @@
 *.db
 *.iml
 data/images/*.jpg
+.idea

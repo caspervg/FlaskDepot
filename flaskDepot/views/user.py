@@ -2,13 +2,14 @@ from wtforms.fields.html5 import EmailField
 from flaskdepot import app, db
 from flaskdepot.models import User, Usergroup
 from flaskdepot.views.base import RedirectForm, get_redirect_target
-from flask import render_template, request, session, flash, jsonify
-from flask.ext.classy import FlaskView
+from flask import render_template, request, session, flash, jsonify, url_for
 from flask_wtf import Form
-from flask_login import login_user, login_required
+from flask_login import login_user, login_required, current_user
 from wtforms import TextField, PasswordField
 from wtforms.validators import Required, Length, EqualTo, Email
 from flask.ext import login
+# testing
+
 
 # User Registration
 class RegistrationForm(RedirectForm):
@@ -41,46 +42,33 @@ class RegistrationForm(RedirectForm):
         return validate
 
 
-class RegisterView(FlaskView):
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
 
-    def index(self):
-        form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User()
+        user.username = form.username.data
+        user.set_password(form.password.data)
+        user.email = form.email.data
+        user.created_ip = request.remote_addr
+        user.group = Usergroup.query.filter_by(is_default=True).first()
+
+        db.session.add(user)
+        db.session.commit()
+
+        login_user(user)
+        flash(u'Thank you for signing up! You are now logged in as {0}'.format(user.username))
+
+        return form.redirect()
+    else:
         return render_template('register.html', form=form)
 
-    def post(self):
-        form = RegistrationForm()
 
-        if form.validate_on_submit():
-            user = User()
-
-            user.username = form.username.data
-            user.set_password(form.password.data)
-            user.email = form.email.data
-
-            user.created_ip = request.remote_addr
-            user.group = Usergroup.query.filter_by(is_default=True).first()
-
-            db.session.add(user)
-            db.session.commit()
-
-            login_user(user)
-            flash(u'Thank you for signing up! You are now logged in as {0}'.format(user.username))
-
-            return form.redirect()
-        else:
-            return render_template('register.html', form=form)
-
-RegisterView.register(app)
-
-
-# User Sign-in
+# User Login
 class LoginForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
     password = PasswordField('Password', validators=[Required()])
-
-    def __init__(self, *args, **kwargs):
-        RedirectForm.__init__(self, *args, **kwargs)
-        self.user = None
 
     def validate(self):
         validate = Form.validate(self)
@@ -98,29 +86,49 @@ class LoginForm(RedirectForm):
                 self.password.errors.append('The password you have used is incorrect.'
                                             ' Make sure that you have typed it correctly.')
                 return False
-
-            self.user = user
             return True
 
 
-class LoginView(FlaskView):
+@app.route('/login/', methods=['GET', 'POST'])
+def login_form():
+    form = LoginForm()
 
-    def index(self):
-        form = LoginForm()
+    if form.validate_on_submit():
+        login_user(form.user)
+        flash(u'You have been logged in as {0}'.format(form.user.username))
+        return form.redirect()
+    else:
         return render_template('login.html', form=form)
 
-    def post(self):
-        form = LoginForm()
+# User Profile
+@login_required
+@app.route('/user/all', methods=['GET'])
+def user_index():
+    if current_user.group.is_admin:
+        users = User.query.all()
+        ret = ''
+        for user in users:
+            ret += '{0}<br>'.format(user.username)
+        return ret
+    else:
+        return 'You cannot access this page'
 
-        if form.validate_on_submit():
-            login_user(form.user);
-            flash(u'You have been logged in as {0}'.format(form.user.username))
-            return form.redirect('/')
-        else:
-            return render_template('login.html', form=form)
+@login_required
+@app.route('/user/<id>', methods=['GET'])
+def user_one(id):
+    if current_user.group.is_admin:
+        user = User.query.filter(User.id == id).first()
+        return user.username
+    else:
+        return 'You cannot access this page'
 
-LoginView.register(app)
+@login_required
+@app.route('/user/me', methods=['GET'])
+def user_me():
+    return current_user.username
 
+
+# Flask-Login initialisation
 def init_login():
     login_manager = login.LoginManager()
     login_manager.init_app(app)
@@ -128,21 +136,5 @@ def init_login():
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.query(User).get(user_id)
+
 init_login()
-
-# User Profile
-class UserView(FlaskView):
-
-    def index(self):
-        users = User.query.all()
-        ret = ''
-        for user in users:
-            ret += '{0}<br>'.format(user.username)
-        return ret
-
-    @login_required
-    def get(self, id):
-        user = User.query.filter(User.id == id).first()
-        return user.username
-
-UserView.register(app)
