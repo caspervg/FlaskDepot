@@ -1,4 +1,4 @@
-from flaskDepot import db, usergroup_cache, url_for
+from flaskdepot import db, usergroup_cache, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 

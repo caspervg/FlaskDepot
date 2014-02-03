@@ -1,6 +1,6 @@
-from flaskDepot import app, db
-from flaskDepot.models import User, Usergroup
-from flaskDepot.views.base import RedirectForm, get_redirect_target
+from flaskdepot import app, db
+from flaskdepot.models import User, Usergroup
+from flaskdepot.views.base import RedirectForm, get_redirect_target
 from flask import render_template, request, session, flash, jsonify
 from flask.ext.classy import FlaskView
 from flask_wtf import Form

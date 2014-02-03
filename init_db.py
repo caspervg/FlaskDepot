@@ -1,4 +1,4 @@
-from flaskDepot.models import *
+from flaskdepot.models import *
 
 db.create_all()
 

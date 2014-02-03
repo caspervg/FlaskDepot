@@ -4,7 +4,7 @@ import os
 DEBUG = True
 
 # Title of your depot
-DEPOT_TITLE = "flaskDepot"
+DEPOT_TITLE = "flask-depot"
 
 # Change this to something sufficiently random. It's used to secure cookies. Keep it secret!
 SECRET_KEY = "This is not secret enough"
@@ -21,7 +21,7 @@ SECRET_KEY = "This is not secret enough"
 #
 # For PostgreSQL:
 # postgresql://username@host/databaseName
-SQLALCHEMY_DATABASE_URI = 'sqlite:///flaskDepot.db'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///flask-depot.db'
 
 # Maximum size of uploaded files (in byte)
 MAX_CONTENT_LENGTH = 30 * 1024 * 1024       # 30 megabyte
