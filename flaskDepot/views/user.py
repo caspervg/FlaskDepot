@@ -1,45 +1,8 @@
-from wtforms.fields.html5 import EmailField
-from flaskDepot import app, db
-from flaskDepot.models import User, Usergroup
-from flaskDepot.views.base import RedirectForm, get_redirect_target
-from flask import render_template, request, session, flash, jsonify, url_for
-from flask_wtf import Form
+from flask import render_template, request, flash
 from flask_login import login_user, login_required, current_user, logout_user
-from wtforms import TextField, PasswordField
-from wtforms.validators import Required, Length, EqualTo, Email
-from flask.ext import login
-# testing
-
-
-# User Registration
-class RegistrationForm(RedirectForm):
-    username = TextField('Username', validators=[Required()])
-
-    email = EmailField('E-mail', validators=[Required(), Email()])
-    confirm_email = TextField('Confirm E-mail', validators=[
-        Required(),
-        EqualTo('email', message="The two e-mails you entered must match")
-    ])
-
-    password = PasswordField('Password', validators=[Required(), Length(4,64)])
-    confirm_password = PasswordField('Confirm Password', validators=[
-        Required(),
-        EqualTo('password', message='The two passwords you entered must match')
-    ])
-
-    def validate(self):
-        validate = Form.validate(self)
-
-        if not validate:
-            return False
-
-        if self.username.data:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user:
-                self.username.errors.append('An account already exists with that username')
-                return False
-
-        return validate
+from flaskDepot import app, db
+from flaskDepot.controllers.user import RegistrationForm, LoginForm
+from flaskDepot.models import User, Usergroup
 
 
 @app.route('/register/', methods=['GET', 'POST'])
@@ -65,36 +28,6 @@ def register():
         return render_template('register.html', form=form)
 
 
-# User Login
-class LoginForm(RedirectForm):
-    username = TextField('Username', validators=[Required()])
-    password = PasswordField('Password', validators=[Required()])
-
-    def __init__(self, *args, **kwargs):
-        super(LoginForm, self).__init__(*args, **kwargs)
-        self.user = None
-
-    def validate(self):
-        validate = Form.validate(self)
-
-        if not validate:
-            return False
-
-        if self.username.data:
-            user = User.query.filter(db.func.lower(User.username) == db.func.lower(self.username.data)).first()
-            if not user:
-                self.username.errors.append('No user with that username exists.'
-                                            ' Make sure that you have typed it correctly.')
-                return False
-            if not user.check_password(self.password.data):
-                self.password.errors.append('The password you have used is incorrect.'
-                                            ' Make sure that you have typed it correctly.')
-                return False
-
-            self.user = user
-            return True
-
-
 @app.route('/login/', methods=['GET', 'POST'])
 def login_form():
     form = LoginForm()
@@ -117,7 +50,7 @@ def logout():
 # User Profile
 @login_required
 @app.route('/user/all/', methods=['GET'])
-def user_index():
+def user_all():
     if current_user.group.is_admin:
         users = User.query.all()
         ret = ''
@@ -126,6 +59,7 @@ def user_index():
         return ret
     else:
         return 'You cannot access this page'
+
 
 @login_required
 @app.route('/user/<id>/', methods=['GET'])
@@ -136,19 +70,8 @@ def user_one(id):
     else:
         return 'You cannot access this page'
 
+
 @login_required
 @app.route('/user/me/', methods=['GET'])
 def user_me():
     return current_user.username
-
-
-# Flask-Login initialisation
-def init_login():
-    login_manager = login.LoginManager()
-    login_manager.init_app(app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return db.session.query(User).get(user_id)
-
-init_login()

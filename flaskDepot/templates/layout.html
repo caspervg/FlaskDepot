@@ -1,0 +1,66 @@
+{% set active_page = active_page|default('index') -%}
+{% from "_helpers.html" import render_nav %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="index,follow,noodp,noydir"/>
+
+        <link href="{{ url_for('static', filename='css/normalize.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ url_for('static', filename='css/foundation.min.css') }}" rel="stylesheet"  type="text/css">
+        <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+
+        <script src="{{ url_for('static', filename='js/vendor/modernizr.js') }}"></script>
+
+        <title>{% block title %}{{ title }}{% endblock %} - {{ config['DEPOT_TITLE'] }}</title>
+    {% endblock %}
+</head>
+<body>
+    {% block navbar %}
+        <nav class="top-bar" data-topbar>
+            <ul class="title-area">
+                <li class="name"><h1><a href="{{ url_for('index') }}">{{ config['DEPOT_TITLE'] }}</a></h1></li>
+                <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+            </ul>
+            <section class="top-bar-section">
+                <!--
+                <ul class="right">
+                    <li class="active"><a href="#">Right Button Active</a></li>
+                    <li class="has-dropdown"><a href="#">Right Button with Dropdown</a>
+                        <ul class="dropdown">
+                            <li><a href="#">First link in dropdown</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                -->
+                <ul class="left">
+                    {{ render_nav('index', 'index', 'Index', active_page) }}
+                    {{ render_nav('search', 'search', 'Search', active_page) }}
+                    {{ render_nav('file_all', 'file_all', 'All Files', active_page) }}
+                    {{ render_nav('upload', 'upload', 'Upload File', active_page) }}
+                    <li class="has-dropdown"><a href="#">User Tools</a>
+                        <ul class="dropdown">
+                            {{ render_nav('user_me', 'profile', 'Profile', active_page) }}
+                            {{ render_nav('user_all', 'userall', 'All Users', active_page) }}
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+        </nav>
+    {% endblock %}
+
+    {% block content %}{% endblock %}
+
+    {% block foot %}
+        <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename='js/foundation.min.js') }}" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            $(document).foundation();
+        </script>
+    {% endblock %}
+</body>
+</html>
