@@ -78,7 +78,7 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return self.id
+        return u'{0}'.format(self.id)
 
 
 class BroadCategory(db.Model):

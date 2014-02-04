@@ -8,8 +8,8 @@ from flaskDepot.controllers.file import UploadForm
 from flaskDepot.models import File, BroadCategory, NarrowCategory
 
 
-@login_required
 @app.route('/upload/', methods=['GET', 'POST'])
+@login_required
 def upload():
     form = UploadForm()
     form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
@@ -54,6 +54,7 @@ def file_one(fileid, slug=None):
 
 
 @app.route('/file/all/', methods=['GET'])
+@login_required
 def file_all():
     files = File.query.all()
     ret = ''

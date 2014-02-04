@@ -42,6 +42,7 @@ def login_form():
 
 
 @app.route('/logout/', methods=['GET'])
+@login_required
 def logout():
     logout_user()
     flash(u'You have been logged out')
@@ -49,8 +50,8 @@ def logout():
 
 
 # User Profile
-@login_required
 @app.route('/user/all/', methods=['GET'])
+@login_required
 def user_all():
     if current_user.group.is_admin:
         users = User.query.all()
@@ -62,8 +63,8 @@ def user_all():
         return 'You cannot access this page'
 
 
-@login_required
 @app.route('/user/<id>/', methods=['GET'])
+@login_required
 def user_one(id):
     if not (current_user.group.is_admin or current_user.id == id):
         return 'You cannot access this page'
@@ -72,8 +73,8 @@ def user_one(id):
         return render_template('profile.html', user=user, title=u"Profile for {0}".format(user.username))
 
 
-@login_required
 @app.route('/user/<id>/edit/', methods=['GET', 'POST'])
+@login_required
 def edit_user(id):
     if not (current_user.group.is_admin or current_user.id == id):
         return 'You cannot access this page'
@@ -92,8 +93,9 @@ def edit_user(id):
 
         return render_template('user_edit.html', form=form, title="Edit profile", user=user)
 
-@login_required
+
 @app.route('/admin/user/<id>/edit/', methods=['GET', 'POST'])
+@login_required
 def admin_edit_user(id):
     if not current_user.group.is_admin:
         return 'You cannot access this page'
@@ -114,8 +116,9 @@ def admin_edit_user(id):
 
         return render_template('admin_user_edit.html', form=form, title="Edit account", user=user)
 
+
+@app.route('/user/<id>/delete/', methods=['GET', 'POST'])
 @login_required
-@app.route('/user/<id>/delete/', methods=['DELETE'])
 def delete_user(id):
     if not (current_user.group.is_admin or current_user.id == id):
         return 'You cannot access this page'
@@ -145,8 +148,7 @@ def delete_user(id):
         return render_template('user_delete.html', form=form, title="Delete account", user=user)
 
 
-
-@login_required
 @app.route('/user/me/', methods=['GET'])
+@login_required
 def user_me():
     return user_one(current_user.id)
