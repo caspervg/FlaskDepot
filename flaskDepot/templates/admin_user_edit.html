@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'upload' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.username, placeholder=user.username) }}
+            {{ render_field(form.group) }}
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Edit" class="button">
+                </div>
+            </div>
+        </form>
+        {{ flashes() }}
+    </div>
+{% endblock %}

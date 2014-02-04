@@ -1,3 +1,4 @@
+from sqlalchemy import CheckConstraint, UniqueConstraint
 from flaskDepot import db, usergroup_cache
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -50,9 +51,12 @@ class User(db.Model):
     files = db.relationship('File', backref='author', lazy='dynamic')
     comments = db.relationship('Comment', backref='user', lazy='dynamic')
     downloads = db.relationship('Download', backref='user', lazy='dynamic')
+    votes = db.relationship('Vote', backref='user', lazy='dynamic')
 
     email = db.Column(db.Unicode(100))
     password_hash = db.Column(db.String(60))
+
+    active = db.Column(db.Boolean, default=True)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -64,15 +68,11 @@ class User(db.Model):
     def url(self):
         return u'/user/{0}'.format(self.id)
 
-    @property
-    def cached_group(self):
-        return Usergroup.get_cached(self.group_id)
-
     def is_authenticated(self):
         return True
 
     def is_active(self):
-        return True
+        return self.active
 
     def is_anonymous(self):
         return False
@@ -135,6 +135,7 @@ class File(db.Model):
 
     comments = db.relationship('Comment', backref='file', lazy='dynamic')
     downloads = db.relationship('Download', backref='file', lazy='dynamic')
+    votes = db.relationship('Vote', backref='file', lazy='dynamic')
 
     broad_category_id = db.Column(db.Integer, db.ForeignKey('fd_broadcategories.id'), nullable=False)
     narrow_category_id = db.Column(db.Integer, db.ForeignKey('fd_narrowcategories.id'), nullable=False)
@@ -166,6 +167,19 @@ class Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.UnicodeText)
+
+    file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)
+
+class Vote(db.Model):
+    __tablename__ = 'fd_votes'
+    __tableargs__ = (db.UniqueConstraint('file_id', 'user_id'),
+                     db.CheckConstraint('value > -6'),
+                     db.CheckConstraint('value < 6'),
+                     {})
+
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.Integer)
 
     file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)

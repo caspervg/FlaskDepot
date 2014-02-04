@@ -22,6 +22,7 @@ SECRET_KEY = "This is not secret enough"
 # For PostgreSQL:
 # postgresql://username@host/databaseName
 SQLALCHEMY_DATABASE_URI = 'sqlite:///flask-depot.db'
+SQLALCHEMY_RECORD_QUERIES = True
 
 # Maximum size of uploaded files (in byte)
 MAX_CONTENT_LENGTH = 30 * 1024 * 1024       # 30 megabyte
@@ -39,3 +40,5 @@ PREVIEW_DIR = os.path.normpath(CURRENT_DIR + '/data/images')
 PREVIEW_MAX_FILESIZE = 1 * 1024 * 1024  # 1 MB
 PREVIEW_MAX_IMGSIZE  = (250, 188)  # (width, height)
 PREVIEW_EXTENSIONS = ['png', 'jpg', 'gif']
+
+

@@ -1,3 +1,4 @@
+from flask.ext.sqlalchemy import get_debug_queries
 from flaskDepot.models import *
 
 db.create_all()
@@ -8,7 +9,7 @@ db.session.add(banned)
 member = Usergroup(name=u'Member', is_default=True)
 db.session.add(member)
 
-admin = Usergroup(name=u'Member', is_admin=True)
+admin = Usergroup(name=u'Admin', is_admin=True)
 db.session.add(admin)
 
 guest = Usergroup(name=u'Guest')
@@ -48,4 +49,10 @@ db.session.add(comment)
 dl_1 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_1)
 dl_2 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_2)
 
+vote = Vote(value=-3, file=file, user=user_1)
+vote = Vote(value=7, file=file, user=user_2)
+vote = Vote(value=-2, file=file, user=user_1)
+
 db.session.commit()
+
+print(get_debug_queries())

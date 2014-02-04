@@ -1,5 +1,5 @@
 # User Login
-from wtforms import TextField, PasswordField, Form
+from wtforms import TextField, PasswordField, Form, SelectField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, EqualTo, Length
 from flaskDepot import db, app
@@ -47,7 +47,7 @@ class RegistrationForm(RedirectForm):
         EqualTo('email', message="The two e-mails you entered must match")
     ])
 
-    password = PasswordField('Password', validators=[Required(), Length(4,64)])
+    password = PasswordField('Password', validators=[Required(), Length(4, 64)])
     confirm_password = PasswordField('Confirm Password', validators=[
         Required(),
         EqualTo('password', message='The two passwords you entered must match')
@@ -64,6 +64,48 @@ class RegistrationForm(RedirectForm):
             if user:
                 self.username.errors.append('An account already exists with that username')
                 return False
+
+        return validate
+
+
+# User Edit Account
+class AccountEditForm(RedirectForm):
+    email = EmailField('E-mail', validators=[Email()])
+    password = PasswordField('Password')
+    confirm_password = PasswordField('Confirm Password', validators=[
+        EqualTo('password', message='The two new passwords you entered must match')
+    ])
+
+    def validate(self):
+        validate = Form.validate(self)
+
+        if self.email.data:
+            user = User.query.filter_by(email=self.email.data).first()
+            if user:
+                self.email.errors.append('An account already exists with that e-mail')
+                validate = False
+
+        return validate
+
+
+# User Delete Account
+class AccountDeleteForm(RedirectForm):
+    username = TextField('Username', validators=[Required()])
+    password = PasswordField('Password', validators=[Length(4, 64)])
+
+# Admin Edit Account
+class AdminAccountEditForm(RedirectForm):
+    group = SelectField('User Group', coerce=int)
+    username = TextField('Username')
+
+    def validate(self):
+        validate = Form.validate(self)
+
+        if self.username.data:
+            user = User.query.filter_by(username=self.username.data).first()
+            if user:
+                self.username.errors.append('An account already exists with that username')
+                validate = False
 
         return validate
 

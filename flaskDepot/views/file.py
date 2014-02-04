@@ -41,10 +41,9 @@ def upload():
         db.session.add(new_file)
         db.session.commit()
 
-        flash('uploading succeeded')
-        return form.redirect()
-    else:
-        return render_template('upload.html', form=form)
+        flash('File has been uploaded')
+
+    return render_template('upload.html', form=form, title="Upload")
 
 
 @app.route('/file/<fileid>/<slug>/', methods=['GET'])

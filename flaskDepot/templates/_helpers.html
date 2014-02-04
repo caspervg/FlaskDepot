@@ -1,7 +1,7 @@
 {% macro render_field(field) %}
     <div class="row">
         <div class="large-12 columns {% if field.errors %} error {% endif %}">
-            <label>{{ field.label }}</label>
+            {{ field.label }}
             {{ field(**kwargs) | safe }}
             {% if field.errors %}
             <small>
@@ -16,4 +16,33 @@
 
 {% macro render_nav(url, id, name, active_page) %}
     <li {% if id == active_page %} class="active"{% endif %}><a href="{{ url_for(url) }}">{{ name }}</a></li>
+{% endmacro %}
+
+{% macro render_info(name, value) %}
+    <div class="row margin-bottom">
+        <div class="small-12 large-12 column">
+            <div class="small-6 large-6 column">
+                <strong>{{ name }}</strong>
+            </div>
+            <div class="small-6 large-6 column">
+                {{ value }}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro flashes() %}
+<div class="row">
+    <div class="large-12 columns">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div data-alert class="alert-box">
+                    {% for message in messages %}
+                        {{ message }} <br />
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>
 {% endmacro %}

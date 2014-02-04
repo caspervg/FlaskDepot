@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_info %}
+{% set activepage = 'profile' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <fieldset>
+            <legend>Your account</legend>
+            {{ render_info('Username', user.username) }}
+            {{ render_info('Group', user.group.name) }}
+            {{ render_info('Account created', user.created_on) }}
+            {{ render_info('E-mail', user.email) }}
+
+            <div class="row margin-top">
+                <div class="large-8 large-centered column text-center">
+                    <a href="{{ url_for('delete_user', id=user.id) }}" class="button alert">Delete account</a>
+                    <a href="{{ url_for('edit_user', id=user.id) }}" class="button success">Edit profile</a>
+                    {% if current_user.group.is_admin %}
+                        <a href="{{ url_for('admin_edit_user', id=user.id) }}" class="button">Edit account</a>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+    </div>
+{% endblock %}
