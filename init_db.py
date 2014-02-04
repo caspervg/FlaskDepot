@@ -36,7 +36,8 @@ db.session.add(narrwcat)
 db.session.commit()
 
 file = File(name=u'TestFile', description=u'A test file', version=u'1.0', author=user_2,
-            num_views=3, file_name='MyTestFile.zip', preview1_name='MyPrev.png', preview2_name='MyPrev.gif')
+            num_views=3, file_name='MyTestFile.zip', preview1_name='MyPrev.png', preview2_name='MyPrev.gif',
+            broad_category=broadcat, narrow_category=narrwcat)
 db.session.add(file)
 
 db.session.commit()
