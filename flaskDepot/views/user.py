@@ -1,10 +1,10 @@
 from wtforms.fields.html5 import EmailField
-from flaskdepot import app, db
-from flaskdepot.models import User, Usergroup
-from flaskdepot.views.base import RedirectForm, get_redirect_target
+from flaskDepot import app, db
+from flaskDepot.models import User, Usergroup
+from flaskDepot.views.base import RedirectForm, get_redirect_target
 from flask import render_template, request, session, flash, jsonify, url_for
 from flask_wtf import Form
-from flask_login import login_user, login_required, current_user
+from flask_login import login_user, login_required, current_user, logout_user
 from wtforms import TextField, PasswordField
 from wtforms.validators import Required, Length, EqualTo, Email
 from flask.ext import login
@@ -70,6 +70,10 @@ class LoginForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
     password = PasswordField('Password', validators=[Required()])
 
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.user = None
+
     def validate(self):
         validate = Form.validate(self)
 
@@ -86,6 +90,8 @@ class LoginForm(RedirectForm):
                 self.password.errors.append('The password you have used is incorrect.'
                                             ' Make sure that you have typed it correctly.')
                 return False
+
+            self.user = user
             return True
 
 
@@ -100,6 +106,14 @@ def login_form():
     else:
         return render_template('login.html', form=form)
 
+
+@app.route('/logout/', methods=['GET'])
+def logout():
+    logout_user()
+    flash(u'You have been logged out')
+    return 'Logged out'
+
+
 # User Profile
 @login_required
 @app.route('/user/all', methods=['GET'])
@@ -108,7 +122,7 @@ def user_index():
         users = User.query.all()
         ret = ''
         for user in users:
-            ret += '{0}<br>'.format(user.username)
+            ret += u'{0}<br>'.format(user.username)
         return ret
     else:
         return 'You cannot access this page'

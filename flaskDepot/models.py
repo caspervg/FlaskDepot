@@ -1,4 +1,4 @@
-from flaskdepot import db, usergroup_cache
+from flaskDepot import db, usergroup_cache
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 
@@ -81,12 +81,6 @@ class User(db.Model):
         return self.id
 
 
-# (Narrow Category <-> Broad Category) Association
-broad_narrow = db.Table('fd_broad_narrow', db.Model.metadata,
-                        db.Column('broad_id', db.Integer, db.ForeignKey('fd_broadcategories.id')),
-                        db.Column('narrow_id', db.Integer, db.ForeignKey('fd_narrowcategories.id')))
-
-
 class BroadCategory(db.Model):
     __tablename__ = 'fd_broadcategories'
 
@@ -94,9 +88,7 @@ class BroadCategory(db.Model):
     name = db.Column(db.Unicode(100), unique=True)
 
     description = db.Column(db.UnicodeText)
-
-    narrow_categories = db.relationship('NarrowCategory', secondary=broad_narrow,
-                                        backref="broad_categories")
+    files = db.relationship('File', backref='broad_category', lazy='dynamic')
 
     @property
     def url(self):
@@ -110,6 +102,7 @@ class NarrowCategory(db.Model):
     name = db.Column(db.Unicode(100), unique=True)
 
     description = db.Column(db.UnicodeText)
+    files = db.relationship('File', backref='narrow_category', lazy='dynamic')
 
     @property
     def url(self):
@@ -120,7 +113,7 @@ class File(db.Model):
     __tablename__ = 'fd_files'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode(100), unique=True)
+    name = db.Column(db.Unicode(128), unique=True)
 
     description = db.Column(db.UnicodeText)
     version = db.Column(db.Unicode(20))
@@ -143,9 +136,13 @@ class File(db.Model):
     comments = db.relationship('Comment', backref='file', lazy='dynamic')
     downloads = db.relationship('Download', backref='file', lazy='dynamic')
 
-    file_name = db.Column(db.String(50))
-    preview1_name = db.Column(db.String(50))
-    preview2_name = db.Column(db.String(50))
+    broad_category_id = db.Column(db.Integer, db.ForeignKey('fd_broadcategories.id'), nullable=False)
+    narrow_category_id = db.Column(db.Integer, db.ForeignKey('fd_narrowcategories.id'), nullable=False)
+
+    file_name = db.Column(db.String(128))
+    slug = db.Column(db.String(128))
+    preview1_name = db.Column(db.String(128))
+    preview2_name = db.Column(db.String(128))
 
     @property
     def url(self):

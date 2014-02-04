@@ -1,19 +1,17 @@
-from datetime import datetime
-import hashlib
 import os
 from flask.ext.login import current_user, login_required
-from werkzeug.debug.repr import dump
 from werkzeug.utils import secure_filename
-from flaskdepot import app, db
-from flaskdepot.models import User, Usergroup, File, BroadCategory, NarrowCategory
-from flaskdepot.views.base import RedirectForm, get_redirect_target
-from flask import render_template, request, session, flash, jsonify
+from flaskDepot import app, db
+from flaskDepot.models import File, BroadCategory, NarrowCategory
+from flaskDepot.views.base import RedirectForm
+from flask import render_template, flash
 from flask_wtf import Form
 from wtforms import TextField, TextAreaField, SelectField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import Required
+from slugify import slugify
 
-class UploadForm(Form):
+class UploadForm(RedirectForm):
 
     filename = TextField('Filename', validators=[
         Required("Please enter a file name.")]
@@ -81,13 +79,14 @@ def upload():
     if form.validate_on_submit():
         new_file = File()
         new_file.name = form.filename.data
+        new_file.slug = slugify(form.filename.data)
         new_file.file_name = secure_filename(form.package.data.filename)
         new_file.preview1_name = secure_filename(form.image_1.data.filename)
         new_file.preview2_name = secure_filename(form.image_2.data.filename) or None
         new_file.description = form.description.data
         new_file.version = form.version.data
-        new_file.broad_category = form.broad_category.data
-        new_file.narrow_category = form.narrow_category.data
+        new_file.broad_category_id = form.broad_category.data
+        new_file.narrow_category_id = form.narrow_category.data
         new_file.author_id = current_user.id
 
         package = form.package.data
@@ -96,7 +95,7 @@ def upload():
         prev1 = form.image_1.data
         prev1.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev1.filename)))
 
-        if form.image_2.data.filename is not None:
+        if len(form.image_2.data.filename) is not 0:
             prev2 = form.image_2.data
             prev2.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev2.filename)))
 
@@ -104,6 +103,21 @@ def upload():
         db.session.commit()
 
         flash('uploading succeeded')
-        return "ok"
+        return form.redirect()
+    else:
+        return render_template('upload.html', form=form)
 
-    return render_template('upload.html', form=form)
+
+@app.route('/file/<fileid>/<slug>', methods=['GET'])
+@app.route('/file/<fileid>', methods=['GET'])
+def file_one(fileid, slug=None):
+    upload = File.query.filter_by(id=fileid).first()
+    return render_template('file.html', upload=upload)
+
+@app.route('/file/all', methods=['GET'])
+def file_all():
+    files = File.query.all()
+    ret = ''
+    for afile in files:
+        ret += u'{0} by {1}<br>'.format(afile.name, afile.author.username)
+    return ret
