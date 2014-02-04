@@ -116,7 +116,7 @@ def logout():
 
 # User Profile
 @login_required
-@app.route('/user/all', methods=['GET'])
+@app.route('/user/all/', methods=['GET'])
 def user_index():
     if current_user.group.is_admin:
         users = User.query.all()
@@ -128,7 +128,7 @@ def user_index():
         return 'You cannot access this page'
 
 @login_required
-@app.route('/user/<id>', methods=['GET'])
+@app.route('/user/<id>/', methods=['GET'])
 def user_one(id):
     if current_user.group.is_admin:
         user = User.query.filter(User.id == id).first()
@@ -137,7 +137,7 @@ def user_one(id):
         return 'You cannot access this page'
 
 @login_required
-@app.route('/user/me', methods=['GET'])
+@app.route('/user/me/', methods=['GET'])
 def user_me():
     return current_user.username
 

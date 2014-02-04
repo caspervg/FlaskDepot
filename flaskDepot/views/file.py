@@ -108,13 +108,13 @@ def upload():
         return render_template('upload.html', form=form)
 
 
-@app.route('/file/<fileid>/<slug>', methods=['GET'])
-@app.route('/file/<fileid>', methods=['GET'])
+@app.route('/file/<fileid>/<slug>/', methods=['GET'])
+@app.route('/file/<fileid>/', methods=['GET'])
 def file_one(fileid, slug=None):
     upload = File.query.filter_by(id=fileid).first()
     return render_template('file.html', upload=upload)
 
-@app.route('/file/all', methods=['GET'])
+@app.route('/file/all/', methods=['GET'])
 def file_all():
     files = File.query.all()
     ret = ''
