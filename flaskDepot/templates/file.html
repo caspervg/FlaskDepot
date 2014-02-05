@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ upload.title }}</title>
-</head>
-<body>
-{{ upload.author.username }} <br />
-{{ upload.broad_category.name }} <br />
-{{ upload.slug }}
-</body>
-</html>
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, render_info, flashes %}
+{% set activepage = 'file' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        {{ flashes() }}
+        <img src="{{ url_for('preview', name=upload.preview1_name) }}"/>
+        <a href="{{ url_for('package', name=upload.file_name) }}">File Download</a>
+    </div>
+{% endblock %}

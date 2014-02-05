@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, send_from_directory
+from flask.ext.login import login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.contrib.cache import SimpleCache
-from config import *
+from flaskDepot.config import *
+
 
 # Caches
 usergroup_cache = SimpleCache()
@@ -19,4 +21,4 @@ import views.user
 import views.file
 import views.index
 import views.search
-
+import views.base

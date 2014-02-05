@@ -31,12 +31,14 @@ MAX_CONTENT_LENGTH = 30 * 1024 * 1024       # 30 megabyte
 CURRENT_DIR = os.path.dirname(__file__)
 
 # Settings for uploaded files
-FILE_DIR = os.path.normpath(CURRENT_DIR + '/data/files')
+FILE_RELATIVE = '/static/data/files'
+FILE_DIR = os.path.normpath(CURRENT_DIR + FILE_RELATIVE)
 FILE_MAX_FILESIZE = 30 * 1024 * 1024  # 30 MB
 FILE_EXTENSIONS = ['zip', 'rar']
 
 # Settings for uploaded preview images
-PREVIEW_DIR = os.path.normpath(CURRENT_DIR + '/data/images')
+PREVIEW_RELATIVE = '/static/data/images'
+PREVIEW_DIR = os.path.normpath(CURRENT_DIR + PREVIEW_RELATIVE)
 PREVIEW_MAX_FILESIZE = 1 * 1024 * 1024  # 1 MB
 PREVIEW_MAX_IMGSIZE  = (250, 188)  # (width, height)
 PREVIEW_EXTENSIONS = ['png', 'jpg', 'gif']

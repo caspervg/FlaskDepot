@@ -1,8 +1,7 @@
-from flask import request, redirect, url_for, render_template
+from flask import request, redirect, url_for, send_from_directory
 from flask_wtf import Form
 from wtforms import HiddenField
 from urlparse import urlparse, urljoin
-import re
 
 
 def get_redirect_target():
@@ -37,3 +36,5 @@ class RedirectForm(Form):
             return redirect(self.next.data)
         target = get_redirect_target() or url
         return redirect(target or url_for(endpoint, **values), code=303)
+
+

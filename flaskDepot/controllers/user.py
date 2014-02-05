@@ -1,5 +1,5 @@
 # User Login
-from wtforms import TextField, PasswordField, Form, SelectField
+from wtforms import TextField, PasswordField, Form, SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, EqualTo, Length
 from flaskDepot import db, app
@@ -11,6 +11,7 @@ from flask.ext import login
 class LoginForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
     password = PasswordField('Password', validators=[Required()])
+    remember = BooleanField('Remember Me')
 
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
@@ -92,6 +93,7 @@ class AccountEditForm(RedirectForm):
 class AccountDeleteForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
     password = PasswordField('Password', validators=[Length(4, 64)])
+
 
 # Admin Edit Account
 class AdminAccountEditForm(RedirectForm):

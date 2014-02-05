@@ -1,18 +1,20 @@
-{% from "_helpers.html" import render_field %}
-<form method=post action="/login/">
-  <dl>
-    {{ form.hidden_tag() }}
-    {{ render_field(form.username) }}
-    {{ render_field(form.password) }}
-  </dl>
-  <p><input type="submit" value="Log in">
-</form>
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<ul class=flashes>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'login' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.username) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.remember) }}
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Log in" class="button">
+                </div>
+            </div>
+        </form>
+        {{ flashes() }}
+    </div>
+{% endblock %}

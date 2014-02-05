@@ -1,4 +1,4 @@
-from flask import render_template, request, flash
+from flask import render_template, request, flash, url_for
 from flask_login import login_user, login_required, current_user, logout_user, fresh_login_required
 from flaskDepot import app, db
 from flaskDepot.controllers.user import RegistrationForm, LoginForm, AccountEditForm, AdminAccountEditForm, \
@@ -32,9 +32,14 @@ def register():
 @app.route('/login/', methods=['GET', 'POST'])
 def login_form():
     form = LoginForm()
+    form.next.data = url_for('index')
 
     if form.validate_on_submit():
-        login_user(form.user)
+        if not form.remember.data:
+            login_user(form.user)
+        else:
+            login_user(form.user, remember=form.remember.data)
+
         flash(u'You have been logged in as {0}'.format(form.user.username))
         return form.redirect()
     else:
@@ -66,19 +71,17 @@ def user_all():
 @app.route('/user/<id>/', methods=['GET'])
 @login_required
 def user_one(id):
-    if not (current_user.group.is_admin or current_user.id == id):
-        return 'You cannot access this page'
-    else:
+    if current_user.group.is_admin or current_user.id == int(id):
         user = User.query.filter_by(id=id).first()
         return render_template('profile.html', user=user, title=u"Profile for {0}".format(user.username))
+    else:
+        return 'You cannot access this page'
 
 
 @app.route('/user/<id>/edit/', methods=['GET', 'POST'])
 @login_required
 def edit_user(id):
-    if not (current_user.group.is_admin or current_user.id == id):
-        return 'You cannot access this page'
-    else:
+    if current_user.group.is_admin or current_user.id == int(id):
         user = User.query.filter_by(id=id).first()
         form = AccountEditForm()
 
@@ -92,6 +95,8 @@ def edit_user(id):
             db.session.commit()
 
         return render_template('user_edit.html', form=form, title="Edit profile", user=user)
+    else:
+        return 'You cannot access this page'
 
 
 @app.route('/admin/user/<id>/edit/', methods=['GET', 'POST'])
@@ -103,7 +108,6 @@ def admin_edit_user(id):
         user = User.query.filter_by(id=id).first()
         form = AdminAccountEditForm()
         form.group.choices = [(group.id, group.name) for group in Usergroup.query.order_by('name')]
-        form.group.data = user.group_id
 
         if form.validate_on_submit():
             if form.group.data and form.group.data is not user.group.id:
@@ -113,6 +117,8 @@ def admin_edit_user(id):
                 user.username = form.username.data
                 flash('The username has been updated')
             db.session.commit()
+        else:
+            form.group.data = user.group_id
 
         return render_template('admin_user_edit.html', form=form, title="Edit account", user=user)
 
@@ -120,32 +126,34 @@ def admin_edit_user(id):
 @app.route('/user/<id>/delete/', methods=['GET', 'POST'])
 @login_required
 def delete_user(id):
-    if not (current_user.group.is_admin or current_user.id == id):
-        return 'You cannot access this page'
-    else:
+    if current_user.group.is_admin or current_user.id == int(id):
         user = User.query.filter_by(id=id).first()
         form = AccountDeleteForm()
 
-        if form.validate_on_submit():
-            if current_user.group.is_admin:
-                if user.username == form.username.data:
+    if form.validate_on_submit():
+        if current_user.group.is_admin:
+            if user.username == form.username.data:
+                user.active = False
+                db.session.commit()
+            else:
+                form.username.errors.append('Please enter the correct username')
+                form.redirect()
+        else:
+            if user.username == form.username.data:
+                if user.check_password(form.password.data):
                     user.active = False
                     db.session.commit()
                 else:
-                    form.username.errors.append('Please enter the correct username')
-                    form.redirect()
+                    form.password.errors.append('Username and password did not match')
             else:
-                if user.username == form.username.data:
-                    if user.check_password(form.password.data):
-                        user.active = False
-                        db.session.commit()
-                    else:
-                        form.password.errors.append('Username and password did not match')
-                else:
-                    form.username.errors.append('Please enter the correct username')
-                    form.redirect()
+                form.username.errors.append('Please enter the correct username')
+                form.redirect()
+    else:
+        return 'You cannot access this page'
 
-        return render_template('user_delete.html', form=form, title="Delete account", user=user)
+    return render_template('user_delete.html', form=form, title="Delete account", user=user)
+
+
 
 
 @app.route('/user/me/', methods=['GET'])
