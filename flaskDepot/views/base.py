@@ -27,18 +27,21 @@ def preview(id, number):
 @app.route('/package/<id>/')
 def package(id):
     file = File.query.filter_by(id=id).first()
-    download = Download.query.filter_by(file_id=id, user_id=current_user.id).first()
-    if download:
-        download.last_downloaded = datetime.utcnow()
-        download.num_downloaded += 1
-        db.session.commit()
-    else:
-        download = Download()
-        download.file = file
-        download.user = current_user
-        download.num_downloaded = 1
-        download.last_downloaded = datetime.utcnow()
-        db.session.add(download)
-        db.session.commit()
+    if file:
+        download = Download.query.filter_by(file_id=id, user_id=current_user.id).first()
+        if download:
+            download.last_downloaded = datetime.utcnow()
+            download.num_downloaded += 1
+            db.session.commit()
+        else:
+            download = Download()
+            download.file = file
+            download.user = current_user
+            download.num_downloaded = 1
+            download.last_downloaded = datetime.utcnow()
+            db.session.add(download)
+            db.session.commit()
 
-    return send_from_directory(app.config['FILE_DIR'], file.file_name)
+        return send_from_directory(app.config['FILE_DIR'], file.file_name)
+    else:
+        raise NotFound()
