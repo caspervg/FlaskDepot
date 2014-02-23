@@ -4,6 +4,7 @@
 
 {% block content %}
     <div class="panel clearfix">
+        <p>{{ flashes() }}</p>
         <div class="row margin-bottom" id="row-files">
             <h3>Latest uploads</h3>
             {% if files|length < 1 %}
@@ -11,21 +12,23 @@
                     <em>No files have been uploaded yet</em>
                 </div>
             {% else %}
-                {% for file in files|reverse %}
-                    <fieldset class="large-3 columns" style="display: block; padding: 5px 20px;">
-                        <legend><a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></legend>
+                <ul class="large-block-grid-{{ files|length }} large-centered">
+                    {% for file in files|reverse %}
+                        <li>
                             <div class="row">
-                                <div class="large-12">
-                                    <img src="{{ url_for('preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img"/>
-                                </div>
+                                <strong><a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></strong>
+                            </div>
+                            <div class="row">
+                                <img src="{{ url_for('preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img" style="width: {{ config['PREVIEW_MAX_IMGSIZE'][0] }}px"/>
                             </div>
                             <div class="row">
                                 <div class="large-12">
                                     created by <strong>{{ file.author.username }}</strong>
                                 </div>
                             </div>
-                    </fieldset>
-                {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
             {% endif %}
         </div>
         <div class="row margin-bottom" id="row-comments">

@@ -155,6 +155,7 @@ class Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.UnicodeText)
+    #on = db.Column(db.DateTime, default=datetime.datetime.now)
 
     file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)

@@ -30,4 +30,4 @@ def gone(e):
 def internal_server_error(e):
     return render_template("error.html", name=u'Server Error',
                            message=u'Sorry, the server encountered an error while processing your request. Please try '
-                                   u'again later. If this problem persists, contact the administration')
+                                   u'again later. If this problem persists, contact the administration'), 500
