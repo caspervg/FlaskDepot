@@ -1,7 +1,7 @@
 import os
 from flask.ext.login import current_user, login_required
 from sqlalchemy import func
-from werkzeug.exceptions import NotAcceptable
+from werkzeug.exceptions import NotAcceptable, abort
 from werkzeug.utils import secure_filename
 from flask import render_template, flash, url_for
 from slugify import slugify
@@ -76,6 +76,10 @@ def file_one(fileid, slug=None):
             flash(u'You have already voted for this file', 'alert')
 
     upload = File.query.filter_by(id=fileid).first()
+
+    if not upload:
+        abort(404)
+
     allow_rating = not current_user.is_anonymous() and (Vote.query.filter_by(file_id=fileid, user_id=current_user.id).first() is None)
     num_rating = db.session.query(func.count(Vote.id)).filter_by(file_id=fileid).scalar()
     avg_rating = db.session.query(func.avg(Vote.value)).filter_by(file_id=fileid).scalar()

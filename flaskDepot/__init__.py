@@ -22,3 +22,4 @@ import views.file
 import views.index
 import views.search
 import views.base
+import views.errors
