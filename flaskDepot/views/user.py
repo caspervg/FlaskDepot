@@ -30,7 +30,7 @@ def register():
 
         return form.redirect()
     else:
-        return render_template('register.html', form=form)
+        return render_template('register.html', form=form, title=u'Registration')
 
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -47,7 +47,7 @@ def login():
         flash(u'You have been logged in as {0}'.format(form.user.username))
         return form.redirect()
     else:
-        return render_template('login.html', form=form)
+        return render_template('login.html', form=form, title=u'Log in')
 
 
 @app.route('/logout/', methods=['GET'])
@@ -98,7 +98,7 @@ def edit_user(id):
                 flash('The password has been updated')
             db.session.commit()
 
-        return render_template('user_edit.html', form=form, title="Edit profile", user=user)
+        return render_template('user_edit.html', form=form, title=u"Edit profile for {0}".format(user.username), user=user)
     else:
         return 'You cannot access this page'
 
@@ -124,7 +124,7 @@ def admin_edit_user(id):
         else:
             form.group.data = user.group_id
 
-        return render_template('admin_user_edit.html', form=form, title="Edit account", user=user)
+        return render_template('admin_user_edit.html', form=form, title=u"Edit account for {0}".format(user.username), user=user)
 
 
 @app.route('/user/<id>/delete/', methods=['GET', 'POST'])
@@ -155,7 +155,7 @@ def delete_user(id):
         else:
             return 'You cannot access this page'
 
-    return render_template('user_delete.html', form=form, title="Delete account", user=user)
+    return render_template('user_delete.html', form=form, title=u"Delete account for {0}".format(user.username), user=user)
 
 
 

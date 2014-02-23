@@ -85,7 +85,8 @@ def file_one(fileid, slug=None):
                            form=form,
                            allow_rating=allow_rating,
                            num_rating=num_rating,
-                           avg_rating=avg_rating)
+                           avg_rating=avg_rating,
+                           title=u'{0} by {1}'.format(upload.name, upload.author.username))
 
 
 @app.route('/file/all/', methods=['GET'])

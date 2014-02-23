@@ -88,8 +88,12 @@
             <h5>Evaluation</h5>
             <fieldset>
                 <legend>Current rating</legend>
+                    {% if avg_rating %}
                     <p style="margin-bottom: 0px">{{ upload.name }} has received an average of <strong>{{ avg_rating }} / 5</strong> points, out of
                        {{ num_rating }} vote(s).</p>
+                    {% else %}
+                    <p style="margin-bottom: 0px">{{ upload.name }} has not received any votes yet.</p>
+                    {% endif %}
             </fieldset>
             <fieldset>
                 <legend>Rate this file</legend>

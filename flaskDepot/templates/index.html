@@ -12,13 +12,8 @@
                 </div>
             {% else %}
                 {% for file in files|reverse %}
-                    <div class="large-3 columns">
-                        <a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">
-                            <div class="row">
-                                <div class="large-12">
-                                    <h5>{{ file.name }}</h5>
-                                </div>
-                            </div>
+                    <fieldset class="large-3 columns" style="display: block; padding: 5px 20px;">
+                        <legend><a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></legend>
                             <div class="row">
                                 <div class="large-12">
                                     <img src="{{ url_for('preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img"/>
@@ -29,8 +24,7 @@
                                     created by <strong>{{ file.author.username }}</strong>
                                 </div>
                             </div>
-                        </a>
-                    </div>
+                    </fieldset>
                 {% endfor %}
             {% endif %}
         </div>
