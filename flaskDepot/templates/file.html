@@ -1,11 +1,128 @@
 {% extends "layout.html" %}
-{% from "_helpers.html" import render_field, render_info, flashes %}
+{% from "_helpers.html" import render_field, render_info, cat_flashes, format_date %}
 {% set activepage = 'file' %}
 
 {% block content %}
+    <style>
+        .preview-img {
+            max-width: {{ config['PREVIEW_MAX_IMGSIZE'][0] }}px;
+        }
+    </style>
     <div class="panel clearfix">
-        {{ flashes() }}
-        <img src="{{ url_for('preview', name=upload.preview1_name) }}"/>
-        <a href="{{ url_for('package', name=upload.file_name) }}">File Download</a>
+
+        <div class="row" id="row-title">
+            <div class="large-12 columns">
+                <h4><strong>{{ upload.name }}</strong> by {{ upload.author.username }}</h4>
+            </div>
+        </div>
+        {{ cat_flashes() }}
+        <div class="row margin-bottom margin-top" id="row-preview">
+            {% if upload.preview2_name %}
+            <div class="large-6 columns text-center">
+                <img src="{{ url_for('preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
+            </div>
+            <div class="large-6 columns">
+                <img src="{{ url_for('preview', id=upload.id, number=2) }}" alt="preview image 2" class="preview-img"/>
+            </div>
+            {% else %}
+            <div class="large-12 column text-center">
+                <img src="{{ url_for('preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row margin-bottom margin-top" id="row-info">
+            <h5>Details</h5>
+            <div class="large-6 column">
+                {{ render_info('Author', upload.author.username) }}
+                {{ render_info('Uploaded', format_date(upload.created_on)) }}
+                {{ render_info('Updated', format_date(upload.updated_on)) }}
+                {{ render_info('Version', upload.version or '1.0') }}
+            </div>
+            <div class="large-6 column">
+                {{ render_info('Broad Category', upload.broad_category.name) }}
+                {{ render_info('Narrow Category', upload.narrow_category.name) }}
+                {{ render_info('Views', upload.num_views) }}
+                {{ render_info('Views', upload.num_downloads) }}
+            </div>
+        </div>
+        <div class="row margin-bottom margin-top" id="row-download">
+            <h5>Download</h5>
+            {% if upload.is_locked %}
+                <div data-alert class="alert-box alert radius">
+                    This file is locked. You cannot download it at this time.
+                    <a href="#" class="close">&times;</a>
+                </div>
+            {%  elif current_user.is_anonymous() %}
+                <div data-alert class="alert-box info radius">
+                    Sorry, only registered users can download files.
+                    <a href="#" class="close">&times;</a>
+                </div>
+            {% elif upload.is_featured %}
+                <a href="{{ url_for('package', id=upload.id) }}" class="button success radius">Download Featured File</a>
+            {% else %}
+                <a href="{{ url_for('package', id=upload.id) }}" class="button radius">Download File</a>
+            {% endif %}
+        </div>
+        {% if not current_user.is_anonymous() and (current_user.group.is_admin or current_user == upload.author) %}
+        <div class="row margin-bottom margin-top" id="row-tools">
+            <h5>Tools</h5>
+            <div class="button-bar">
+                <ul class="button-group radius" id="author-buttons">
+                    <li><a href="#" class="button small success">Edit File</a></li>
+                    <li><a href="#" class="button small warning">Lock File</a></li>
+                    <li><a href="#" class="button small alert">Delete File</a></li>
+                </ul>
+                {% if current_user.group.is_admin %}
+                <ul class="button-group radius" id="admin-buttons">
+                    <li><a href="#" class="button small secondary">Feature File</a></li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="row margin-bottom margin-top" id="row-description">
+            <h5>Description</h5>
+            {{ upload.description | safe }}
+        </div>
+        <div class="row margin-bottom margin-top" id="row-evaluation">
+            <h5>Evaluation</h5>
+            <fieldset>
+                <legend>Current rating</legend>
+                    <p style="margin-bottom: 0px">{{ upload.name }} has received an average of <strong>{{ avg_rating }} / 5</strong> points, out of
+                       {{ num_rating }} vote(s).</p>
+            </fieldset>
+            <fieldset>
+                <legend>Rate this file</legend>
+                <form method="post" action="{{ url_for('file_one', fileid=upload.id) }}">
+                    {{ form.hidden_tag() }}
+                    {% if allow_rating %}
+                        {{ render_field(form.rating, placeholder='Optional (>= 0 and <= 5)') }}
+                    {% endif %}
+                    {{ render_field(form.comment, placeholder='>= 16 and <= 512 characters') }}
+                    <input type="submit" value="evaluate" class="button info small" style="margin-bottom: 0px;">
+                </form>
+            </fieldset>
+        </div>
+        <div class="row margin-bottom margin-top" id="row-comments">
+            <h5>Comments</h5>
+            <table style="min-width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="width:30%;">User</th>
+                        <th style="width:70%;">Comment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% with comments = upload.comments %}
+                        {% for comment in comments|reverse %}
+                            <tr>
+                                <td>{{ comment.user.username|striptags }}</td>
+                                <td>{{ comment.text|striptags }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}

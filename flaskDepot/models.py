@@ -149,18 +149,6 @@ class File(db.Model):
     def url(self):
         return u'/file/{0}'.format(self.id)
 
-    def can_be_edited_by(self, user):
-        if user.is_admin:
-            return True
-        else:
-            return user == self.creator
-
-    def can_be_deleted_by(self, user):
-        if user.is_admin:
-            return True
-        else:
-            return user == self.creator
-
 
 class Comment(db.Model):
     __tablename__ = 'fd_comments'
@@ -171,10 +159,11 @@ class Comment(db.Model):
     file_id = db.Column(db.Integer, db.ForeignKey('fd_files.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('fd_users.id'), nullable=False)
 
+
 class Vote(db.Model):
     __tablename__ = 'fd_votes'
     __tableargs__ = (db.UniqueConstraint('file_id', 'user_id'),
-                     db.CheckConstraint('value > -6'),
+                     db.CheckConstraint('value > -1'),
                      db.CheckConstraint('value < 6'),
                      {})
 

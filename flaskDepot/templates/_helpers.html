@@ -46,3 +46,34 @@
     </div>
 </div>
 {% endmacro %}
+
+{% macro cat_alert(category) %}
+    {% with messages = get_flashed_messages(category_filter=category) %}
+        {% if messages %}
+            <div data-alert class="alert-box {{ category }} small">
+                {% for message in messages %}
+                    {{ message }} <br/>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endmacro %}
+
+{% macro cat_flashes() %}
+<div class="row">
+    <div class="large-12 columns">
+        {{ cat_alert('alert') }}
+        {{ cat_alert('warning') }}
+        {{ cat_alert('success') }}
+        {{ cat_alert('info') }}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro format_date(date) %}
+{% if date %}
+    {{ date.strftime("%Y-%m-%d") }}
+{% else %}
+    {{ 'Never' }}
+{% endif %}
+{% endmacro %}

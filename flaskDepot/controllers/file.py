@@ -1,7 +1,7 @@
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from werkzeug.utils import secure_filename
-from wtforms import TextField, TextAreaField, SelectField, Form
-from wtforms.validators import Required
+from wtforms import TextField, TextAreaField, SelectField, Form, IntegerField
+from wtforms.validators import Required, NumberRange, Length, Optional
 from flaskDepot import app
 from flaskDepot.controllers.base import RedirectForm
 from flaskDepot.models import File
@@ -66,3 +66,7 @@ class UploadForm(RedirectForm):
         return validate
 
 
+class EvaluationForm(RedirectForm):
+
+    rating = IntegerField('Rating', validators=[Optional(), NumberRange(min=0, max=5)])
+    comment = TextAreaField('Comment', validators=[Length(min=16, max=512)])

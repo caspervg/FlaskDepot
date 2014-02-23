@@ -1,0 +1,63 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'index' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <div class="row margin-bottom" id="row-files">
+            <h3>Latest uploads</h3>
+            {% if files|length < 1 %}
+                <div class="large-3 large-centered">
+                    <em>No files have been uploaded yet</em>
+                </div>
+            {% else %}
+                {% for file in files|reverse %}
+                    <div class="large-3 columns">
+                        <a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">
+                            <div class="row">
+                                <div class="large-12">
+                                    <h5>{{ file.name }}</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="large-12">
+                                    <img src="{{ url_for('preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="large-12">
+                                    created by <strong>{{ file.author.username }}</strong>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="row margin-bottom" id="row-comments">
+            <h3>Latest comments</h3>
+            {% if comments|length < 1 %}
+                <div class="large-9 large-centered">
+                    <em>No comments have been made yet</em>
+                </div>
+            {% else %}
+                <table style="min-width: 100%;">
+                    <thead>
+                    <tr>
+                        <th style="width:30%;">User</th>
+                        <th style="width:70%;">Comment</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for comment in comments|reverse %}
+                            <tr>
+                                <td>{{ comment.user.username|striptags }}</td>
+                                <td>{{ comment.text|striptags }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

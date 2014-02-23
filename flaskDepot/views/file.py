@@ -1,11 +1,13 @@
 import os
 from flask.ext.login import current_user, login_required
+from sqlalchemy import func
+from werkzeug.exceptions import NotAcceptable
 from werkzeug.utils import secure_filename
-from flask import render_template, flash
+from flask import render_template, flash, url_for
 from slugify import slugify
 from flaskDepot import app, db
-from flaskDepot.controllers.file import UploadForm
-from flaskDepot.models import File, BroadCategory, NarrowCategory
+from flaskDepot.controllers.file import UploadForm, EvaluationForm
+from flaskDepot.models import File, BroadCategory, NarrowCategory, Comment, Vote
 
 
 @app.route('/upload/', methods=['GET', 'POST'])
@@ -46,11 +48,44 @@ def upload():
     return render_template('upload.html', form=form, title="Upload")
 
 
-@app.route('/file/<fileid>/<slug>/', methods=['GET'])
-@app.route('/file/<fileid>/', methods=['GET'])
+@app.route('/file/<fileid>/<slug>/', methods=['GET', 'POST'])
+@app.route('/file/<fileid>/', methods=['GET', 'POST'])
 def file_one(fileid, slug=None):
+    form = EvaluationForm()
+
+    if form.validate_on_submit():
+        if form.comment.data:
+            comment = Comment()
+            comment.text = form.comment.data
+            comment.user_id = current_user.id
+            comment.file_id = fileid
+            db.session.add(comment)
+            db.session.commit()
+            flash(u'Your comment has been added', 'success')
+    if form.rating.data:
+        vote = Vote.query.filter_by(file_id=fileid, user_id=current_user.id).first()
+        if not vote:
+            vote = Vote()
+            vote.value = form.rating.data
+            vote.file_id = fileid
+            vote.user_id = current_user.id
+            db.session.add(vote)
+            db.session.commit()
+            flash(u'Your rating has been added', 'success')
+        else:
+            flash(u'You have already voted for this file', 'alert')
+
     upload = File.query.filter_by(id=fileid).first()
-    return render_template('file.html', upload=upload)
+    allow_rating = not current_user.is_anonymous() and (Vote.query.filter_by(file_id=fileid, user_id=current_user.id).first() is None)
+    num_rating = db.session.query(func.count(Vote.id)).filter_by(file_id=fileid).scalar()
+    avg_rating = db.session.query(func.avg(Vote.value)).filter_by(file_id=fileid).scalar()
+
+    return render_template('file.html',
+                           upload=upload,
+                           form=form,
+                           allow_rating=allow_rating,
+                           num_rating=num_rating,
+                           avg_rating=avg_rating)
 
 
 @app.route('/file/all/', methods=['GET'])

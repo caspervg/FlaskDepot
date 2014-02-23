@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, url_for
+from flask import render_template, request, flash, url_for, redirect
 from flask_login import login_user, login_required, current_user, logout_user, fresh_login_required
 from flaskDepot import app, db
 from flaskDepot.controllers.user import RegistrationForm, LoginForm, AccountEditForm, AdminAccountEditForm, \
@@ -8,6 +8,10 @@ from flaskDepot.models import User, Usergroup
 
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
+
+    if current_user.is_authenticated():
+        return redirect(url_for('index'))
+
     form = RegistrationForm()
 
     if form.validate_on_submit():
@@ -30,7 +34,7 @@ def register():
 
 
 @app.route('/login/', methods=['GET', 'POST'])
-def login_form():
+def login():
     form = LoginForm()
     form.next.data = url_for('index')
 
@@ -130,26 +134,26 @@ def delete_user(id):
         user = User.query.filter_by(id=id).first()
         form = AccountDeleteForm()
 
-    if form.validate_on_submit():
-        if current_user.group.is_admin:
-            if user.username == form.username.data:
-                user.active = False
-                db.session.commit()
-            else:
-                form.username.errors.append('Please enter the correct username')
-                form.redirect()
-        else:
-            if user.username == form.username.data:
-                if user.check_password(form.password.data):
+        if form.validate_on_submit():
+            if current_user.group.is_admin:
+                if user.username == form.username.data:
                     user.active = False
                     db.session.commit()
                 else:
-                    form.password.errors.append('Username and password did not match')
+                    form.username.errors.append('Please enter the correct username')
+                    form.redirect()
             else:
-                form.username.errors.append('Please enter the correct username')
-                form.redirect()
-    else:
-        return 'You cannot access this page'
+                if user.username == form.username.data:
+                    if user.check_password(form.password.data):
+                        user.active = False
+                        db.session.commit()
+                    else:
+                        form.password.errors.append('Username and password did not match')
+                else:
+                    form.username.errors.append('Please enter the correct username')
+                    form.redirect()
+        else:
+            return 'You cannot access this page'
 
     return render_template('user_delete.html', form=form, title="Delete account", user=user)
 
