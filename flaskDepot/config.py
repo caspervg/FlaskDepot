@@ -42,5 +42,3 @@ PREVIEW_DIR = os.path.normpath(CURRENT_DIR + PREVIEW_RELATIVE)
 PREVIEW_MAX_FILESIZE = 1 * 1024 * 1024  # 1 MB
 PREVIEW_MAX_IMGSIZE  = (250, 188)  # (width, height)
 PREVIEW_EXTENSIONS = ['png', 'jpg', 'gif']
-
-

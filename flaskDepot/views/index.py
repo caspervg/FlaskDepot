@@ -2,7 +2,7 @@ from flask import render_template, jsonify
 from flaskDepot import app
 from flaskDepot.models import File, Comment
 
-
+@app.route('/')
 @app.route('/index/', methods=['GET'])
 def index():
     files = File.query.order_by(File.created_on).limit(3).all()

@@ -75,9 +75,9 @@ def file_one(fileid, slug=None):
         else:
             flash(u'You have already voted for this file', 'alert')
 
-    upload = File.query.filter_by(id=fileid).first()
+    _file = File.query.filter_by(id=fileid).first()
 
-    if not upload:
+    if not _file:
         abort(404)
 
     allow_rating = not current_user.is_anonymous() and (Vote.query.filter_by(file_id=fileid, user_id=current_user.id).first() is None)
@@ -85,12 +85,12 @@ def file_one(fileid, slug=None):
     avg_rating = db.session.query(func.avg(Vote.value)).filter_by(file_id=fileid).scalar()
 
     return render_template('file.html',
-                           upload=upload,
+                           upload=_file,
                            form=form,
                            allow_rating=allow_rating,
                            num_rating=num_rating,
                            avg_rating=avg_rating,
-                           title=u'{0} by {1}'.format(upload.name, upload.author.username))
+                           title=u'{0} by {1}'.format(_file.name, _file.author.username))
 
 
 @app.route('/file/all/', methods=['GET'])
