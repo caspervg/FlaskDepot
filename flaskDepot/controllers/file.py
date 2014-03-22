@@ -2,9 +2,9 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from werkzeug.utils import secure_filename
 from wtforms import TextField, TextAreaField, SelectField, Form, IntegerField
 from wtforms.validators import Required, NumberRange, Length, Optional
-from flaskDepot import app
-from flaskDepot.controllers.base import RedirectForm
-from flaskDepot.models import File
+from flaskdepot import app
+from flaskdepot.controllers.base import RedirectForm
+from flaskdepot.models import File
 
 
 class UploadForm(RedirectForm):

@@ -1,5 +1,5 @@
 from flask.ext.sqlalchemy import get_debug_queries
-from flaskDepot.models import *
+from flaskdepot.models import *
 
 db.create_all()
 

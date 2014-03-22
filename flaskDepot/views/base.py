@@ -2,8 +2,8 @@ from datetime import datetime
 from flask import send_from_directory
 from flask.ext.login import login_required, current_user
 from werkzeug.exceptions import NotFound, NotAcceptable
-from flaskDepot import app, db
-from flaskDepot.models import File, Download
+from flaskdepot import app, db
+from flaskdepot.models import File, Download
 
 
 @app.route('/preview/<id>/<number>/')

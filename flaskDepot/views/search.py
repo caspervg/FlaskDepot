@@ -1,4 +1,4 @@
-from flaskDepot import app
+from flaskdepot import app
 
 
 @app.route('/search/', methods=['GET'])

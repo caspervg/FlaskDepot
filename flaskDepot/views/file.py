@@ -5,9 +5,9 @@ from werkzeug.exceptions import NotAcceptable, abort
 from werkzeug.utils import secure_filename
 from flask import render_template, flash, url_for
 from slugify import slugify
-from flaskDepot import app, db
-from flaskDepot.controllers.file import UploadForm, EvaluationForm
-from flaskDepot.models import File, BroadCategory, NarrowCategory, Comment, Vote
+from flaskdepot import app, db
+from flaskdepot.controllers.file import UploadForm, EvaluationForm
+from flaskdepot.models import File, BroadCategory, NarrowCategory, Comment, Vote
 
 
 @app.route('/upload/', methods=['GET', 'POST'])

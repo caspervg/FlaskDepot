@@ -1,6 +1,6 @@
 from flask import render_template, jsonify
-from flaskDepot import app
-from flaskDepot.models import File, Comment
+from flaskdepot import app
+from flaskdepot.models import File, Comment
 
 @app.route('/')
 @app.route('/index/', methods=['GET'])
