@@ -9,17 +9,16 @@ def configure_blueprints(app):
 
     from flaskdepot.user.views import user
     from flaskdepot.base.views import base
-    # from flaskdepot.auth.views import auth
-    #from flaskdepot.admin.views import admin
+    from flaskdepot.admin.views import admin
     from flaskdepot.file.views import file
     from flaskdepot.search.views import search
 
     app.register_blueprint(file, url_prefix=app.config["FILE_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_PREFIX"])
     app.register_blueprint(search, url_prefix=app.config["SEARCH_PREFIX"])
+    app.register_blueprint(admin, url_prefix=app.config["ADMIN_PREFIX"])
     app.register_blueprint(base)
-    #app.register_blueprint(auth, url_prefix=app.config["AUTH_PREFIX"])
-    #app.register_blueprint(admin, url_prefix=app.config["ADMIN_PREFIX"])
+
 
 
 def configure_extensions(app):

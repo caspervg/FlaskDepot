@@ -96,19 +96,3 @@ class AccountEditForm(RedirectForm):
 # User Delete Account
 class AccountDeleteForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
-
-# Admin Edit Account
-class AdminAccountEditForm(RedirectForm):
-    group = SelectField('User Group', coerce=int)
-    username = TextField('Username')
-
-    def validate(self):
-        validate = Form.validate(self)
-
-        if self.username.data:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user:
-                self.username.errors.append('An account already exists with that username')
-                validate = False
-
-        return validate
