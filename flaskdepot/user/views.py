@@ -2,8 +2,7 @@ from flask import render_template, request, flash, url_for, redirect, Blueprint,
 from flask_login import login_user, login_required, current_user, logout_user
 from flaskdepot.extensions import db
 from flaskdepot.user.models import User, Usergroup
-from flaskdepot.user.controllers import RegistrationForm, LoginForm, AccountEditForm, AccountDeleteForm,\
-    AdminAccountEditForm
+from flaskdepot.user.controllers import RegistrationForm, LoginForm, AccountEditForm, AccountDeleteForm
 
 user = Blueprint("user", __name__)
 

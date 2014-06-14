@@ -1,6 +1,6 @@
 from wtforms import SelectField, TextField, Form
-from flaskDepot.base.controllers import RedirectForm
-from flaskDepot.user.models import User
+from flaskdepot.base.controllers import RedirectForm
+from flaskdepot.user.models import User
 
 
 class AdminAccountEditForm(RedirectForm):

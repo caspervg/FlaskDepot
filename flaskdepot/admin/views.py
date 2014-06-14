@@ -1,15 +1,15 @@
 from flask import Blueprint, abort, flash, render_template
 from flask.ext.login import login_required, current_user
-from flaskDepot.admin.controllers import AdminAccountEditForm
-from flaskDepot.extensions import db
-from flaskDepot.user.models import User, Usergroup
+from flaskdepot.admin.controllers import AdminAccountEditForm
+from flaskdepot.extensions import db
+from flaskdepot.user.models import User, Usergroup
 
 admin = Blueprint("admin", __name__)
 
 
 @admin.route('/user/<id>/edit/', methods=['GET', 'POST'])
 @login_required
-def admin_edit_user(id):
+def edit_user(id):
     if not current_user.group.is_admin:
         abort(403)
     else:
