@@ -33,7 +33,7 @@ class DefaultConfig(object):
     MAX_CONTENT_LENGTH = 30 * 1024 * 1024       # 30 megabyte
 
     # Do not change this!
-    CURRENT_DIR = os.path.dirname(__file__)
+    CURRENT_DIR = os.path.dirname(os.path.dirname(__file__))
 
     # Settings for uploaded files
     FILE_RELATIVE = '/static/data/files'
