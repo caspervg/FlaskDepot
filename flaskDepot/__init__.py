@@ -1,1 +1,0 @@
-from flaskdepot.app import create_app
