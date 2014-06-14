@@ -106,9 +106,9 @@ def file_all():
     return ret
 
 
-@file.route('/preview/<_id>/<number>/')
-def preview(_id, number):
-    _file = File.query.filter_by(id=_id).first()
+@file.route('/preview/<id>/<number>/')
+def preview(id, number):
+    _file = File.query.filter_by(id=id).first()
     if _file:
         if int(number) == 1:
             return send_from_directory(current_app.config['PREVIEW_DIR'], _file.preview1_name)
@@ -124,11 +124,11 @@ def preview(_id, number):
 
 
 @login_required
-@file.route('/package/<_id>/')
-def package(_id):
-    _file = File.query.filter_by(id=_id).first()
+@file.route('/package/<id>/')
+def package(id):
+    _file = File.query.filter_by(id=id).first()
     if _file:
-        download = Download.query.filter_by(file_id=_id, user_id=current_user.id).first()
+        download = Download.query.filter_by(file_id=id, user_id=current_user.id).first()
         if download:
             download.last_downloaded = datetime.utcnow()
             download.num_downloaded += 1

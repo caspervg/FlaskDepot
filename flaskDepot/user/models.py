@@ -38,7 +38,7 @@ class User(db.Model):
         return u'/user/{0}'.format(self.id)
 
     def is_authenticated(self):
-        return True
+        return self.active
 
     def is_active(self):
         return self.active
