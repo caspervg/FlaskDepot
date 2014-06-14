@@ -43,12 +43,14 @@
                     {{ render_nav('search.search_index', 'search', 'Search', active_page) }}
                     {{ render_nav('file.file_all', 'file_all', 'All Files', active_page) }}
                     {{ render_nav('file.upload', 'upload', 'Upload File', active_page) }}
-                    <li class="has-dropdown"><a href="#">User Tools</a>
-                        <ul class="dropdown">
-                            {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
-                            {{ render_nav('user.user_all', 'userall', 'All Users', active_page) }}
-                        </ul>
-                    </li>
+                    {% if current_user.is_authenticated() %}
+                        <li class="has-dropdown"><a href="#">User Tools</a>
+                            <ul class="dropdown">
+                                {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
+                                {{ render_nav('user.user_all', 'userall', 'All Users', active_page) }}
+                            </ul>
+                        </li>
+                    {% endif %}
                 </ul>
             </section>
         </nav>
