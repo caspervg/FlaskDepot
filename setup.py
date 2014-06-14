@@ -31,7 +31,7 @@ setup(
         'SQLAlchemy==0.9.3',
         'WTForms==1.0.5',
         'Werkzeug==0.9.4',
-        'alembic==0.6.3',
+        'alembic==0.6.3', 'slugify',
     ],
     dependency_links=[],
     classifiers=[
