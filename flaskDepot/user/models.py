@@ -2,6 +2,7 @@ from flaskdepot.extensions import db
 from datetime import datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
+
 class User(db.Model):
     __tablename__ = 'fd_users'
 
@@ -10,7 +11,7 @@ class User(db.Model):
 
     group_id = db.Column(db.Integer, db.ForeignKey('fd_usergroups.id'), nullable=False)
 
-    created_on = db.Column(db.DateTime, default=datetime.datetime.now)
+    created_on = db.Column(db.DateTime, default=datetime.now())
     created_ip = db.Column(db.String(16))
 
     last_active_on = db.Column(db.DateTime)

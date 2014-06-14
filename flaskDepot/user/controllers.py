@@ -2,10 +2,9 @@
 from wtforms import TextField, PasswordField, Form, SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, EqualTo, Length
-from flaskdepot import db, app
-from flaskdepot.controllers.base import RedirectForm
-from flaskdepot.models import User
-from flask.ext import login
+from flaskdepot.base.controllers import RedirectForm
+from flaskdepot.extensions import db
+from flaskdepot.user.models import User
 
 
 class LoginForm(RedirectForm):
