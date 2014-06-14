@@ -20,7 +20,7 @@ def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and \
-           ref_url.netloc == test_url.netloc
+        ref_url.netloc == test_url.netloc
 
 
 class RedirectForm(Form):
@@ -36,5 +36,3 @@ class RedirectForm(Form):
             return redirect(self.next.data)
         target = get_redirect_target() or url
         return redirect(target or url_for(endpoint, **values), code=303)
-
-

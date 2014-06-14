@@ -1,9 +1,11 @@
-from flask import render_template, jsonify
-from flaskDepot import app
-from flaskDepot.models import File, Comment
+from flask import Blueprint, render_template
+from flaskdepot.file.models import File, Comment
 
-@app.route('/')
-@app.route('/index/', methods=['GET'])
+base = Blueprint("base", __name__)
+
+
+@base.route('/')
+@base.route('/index/', methods=['GET'])
 def index():
     files = File.query.order_by(File.created_on).limit(3).all()
     comments = Comment.query.order_by(Comment.id).limit(10).all()

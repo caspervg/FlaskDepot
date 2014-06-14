@@ -2,10 +2,9 @@
 from wtforms import TextField, PasswordField, Form, SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, EqualTo, Length
-from flaskDepot import db, app
-from flaskDepot.controllers.base import RedirectForm
-from flaskDepot.models import User
-from flask.ext import login
+from flaskdepot.base.controllers import RedirectForm
+from flaskdepot.extensions import db
+from flaskdepot.user.models import User
 
 
 class LoginForm(RedirectForm):
@@ -24,7 +23,12 @@ class LoginForm(RedirectForm):
             return False
 
         if self.username.data:
-            user = User.query.filter(db.func.lower(User.username) == db.func.lower(self.username.data)).first()
+            user = User\
+                .query\
+                .filter(db.func.lower(User.username) == db.func.lower(self.username.data))\
+                .filter_by(active=True)\
+                .first()
+
             if not user:
                 self.username.errors.append('No user with that username exists.'
                                             ' Make sure that you have typed it correctly.')
@@ -92,33 +96,3 @@ class AccountEditForm(RedirectForm):
 # User Delete Account
 class AccountDeleteForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
-    password = PasswordField('Password', validators=[Length(4, 64)])
-
-
-# Admin Edit Account
-class AdminAccountEditForm(RedirectForm):
-    group = SelectField('User Group', coerce=int)
-    username = TextField('Username')
-
-    def validate(self):
-        validate = Form.validate(self)
-
-        if self.username.data:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user:
-                self.username.errors.append('An account already exists with that username')
-                validate = False
-
-        return validate
-
-
-# Flask-Login initialisation
-def init_login():
-    login_manager = login.LoginManager()
-    login_manager.init_app(app)
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return db.session.query(User).get(user_id)
-
-init_login()

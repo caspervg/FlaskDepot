@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="panel clearfix">
-        <form method=post action="/upload/" enctype="multipart/form-data">
+        <form method=post action="{{ url_for('file.upload') }}" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             {{ render_field(form.filename) }}
             {{ render_field(form.package) }}

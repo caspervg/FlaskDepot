@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'upload' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="row">
+                <div class="large-12 columns">
+                    {% if not current_user.group.is_admin %}
+                        <p>For security, please enter your current username before deleting your account.
+                            Deleting an account <strong>cannot be undone</strong>!</p>
+                    {% else %}
+                        <p>For security, please enter the username that you want to delete. Deleting an
+                            account <strong>cannot be undone</strong>!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {{ render_field(form.username, placeholder=user.username) }}
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Delete" class="button">
+                </div>
+            </div>
+        </form>
+        {{ flashes() }}
+    </div>
+{% endblock %}

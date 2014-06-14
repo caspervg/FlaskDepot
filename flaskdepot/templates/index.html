@@ -16,10 +16,10 @@
                     {% for file in files|reverse %}
                         <li>
                             <div class="row">
-                                <strong><a href="{{ url_for('file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></strong>
+                                <strong><a href="{{ url_for('file.file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></strong>
                             </div>
                             <div class="row">
-                                <img src="{{ url_for('preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img" style="width: {{ config['PREVIEW_MAX_IMGSIZE'][0] }}px"/>
+                                <img src="{{ url_for('file.preview', id=file.id, number=1) }}" alt="preview image 1" class="preview-img" style="width: {{ config['PREVIEW_MAX_IMGSIZE'][0] }}px"/>
                             </div>
                             <div class="row">
                                 <div class="large-12">

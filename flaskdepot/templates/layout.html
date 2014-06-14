@@ -22,33 +22,35 @@
     {% block navbar %}
         <nav class="top-bar" data-topbar>
             <ul class="title-area">
-                <li class="name"><h1><a href="{{ url_for('index') }}">{{ config['DEPOT_TITLE'] }}</a></h1></li>
+                <li class="name"><h1><a href="{{ url_for('base.index') }}">{{ config['DEPOT_TITLE'] }}</a></h1></li>
                 <li class="toggle-topbar menu-icon"><a href="#">Menu</a></li>
             </ul>
             <section class="top-bar-section">
                 <ul class="right">
                     {% if current_user.is_authenticated() %}
                         <li class="has-form">
-                            <a href="{{ url_for('logout') }}" class="button">Log out</a>
+                            <a href="{{ url_for('user.logout') }}" class="button">Log out</a>
                         </li>
                     {% else %}
                         <li class="has-form">
-                            <a href="{{ url_for('login') }}" class="button">Log in</a>
+                            <a href="{{ url_for('user.login') }}" class="button">Log in</a>
                         </li>
                     {% endif %}
                 </ul>
 
                 <ul class="left">
-                    {{ render_nav('index', 'index', 'Index', active_page) }}
-                    {{ render_nav('search', 'search', 'Search', active_page) }}
-                    {{ render_nav('file_all', 'file_all', 'All Files', active_page) }}
-                    {{ render_nav('upload', 'upload', 'Upload File', active_page) }}
-                    <li class="has-dropdown"><a href="#">User Tools</a>
-                        <ul class="dropdown">
-                            {{ render_nav('user_me', 'profile', 'Profile', active_page) }}
-                            {{ render_nav('user_all', 'userall', 'All Users', active_page) }}
-                        </ul>
-                    </li>
+                    {{ render_nav('base.index', 'index', 'Index', active_page) }}
+                    {{ render_nav('search.search_index', 'search', 'Search', active_page) }}
+                    {{ render_nav('file.file_all', 'file_all', 'All Files', active_page) }}
+                    {{ render_nav('file.upload', 'upload', 'Upload File', active_page) }}
+                    {% if current_user.is_authenticated() %}
+                        <li class="has-dropdown"><a href="#">User Tools</a>
+                            <ul class="dropdown">
+                                {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
+                                {{ render_nav('user.user_all', 'userall', 'All Users', active_page) }}
+                            </ul>
+                        </li>
+                    {% endif %}
                 </ul>
             </section>
         </nav>
