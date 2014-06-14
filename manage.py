@@ -14,17 +14,17 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
                               prompt_bool)
 from flask.ext.migrate import MigrateCommand
-
-from flaskdepot import create_app
-from flaskbb.extensions import db
-from flaskbb.utils.populate import (create_test_data, create_welcome_forum,
-                                    create_admin_user, create_default_groups)
+from flaskdepot.app import create_app
+from flaskdepot.extensions import db
+from flaskdepot.utils.populate import create_default_groups, create_admin_user, create_normal_user, create_sample_data
 
 # Use the development configuration if available
+from flaskdepot.user.models import Usergroup
+
 try:
-    from flaskbb.configs.development import DevelopmentConfig as Config
+    from flaskdepot.configs.development import DevelopmentConfig as Config
 except ImportError:
-    from flaskbb.configs.default import DefaultConfig as Config
+    from flaskdepot.configs.default import DefaultConfig as Config
 
 app = create_app(Config)
 manager = Manager(app)
@@ -56,25 +56,6 @@ def dropdb():
     db.drop_all()
 
 
-@manager.command
-def createall(dropdb=False, createdb=False):
-    """Creates the database with some testing content.
-    If you do not want to drop or create the db add
-    '-c' (to not create the db) and '-d' (to not drop the db)
-    """
-
-    if not dropdb:
-        app.logger.info("Dropping database...")
-        db.drop_all()
-
-    if not createdb:
-        app.logger.info("Creating database...")
-        db.create_all()
-
-    app.logger.info("Creating test data...")
-    create_test_data()
-
-
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
@@ -92,7 +73,21 @@ def create_admin(username=None, password=None, email=None):
 @manager.option('-u', '--username', dest='username')
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
-def initflaskbb(username=None, password=None, email=None):
+def create_user(username=None, password=None, email=None):
+    """Creates a normal user"""
+
+    if not (username and password and email):
+        username = prompt("Username")
+        email = prompt("A valid email address")
+        password = prompt_pass("Password")
+
+    create_normal_user(username=username, password=password, email=email)
+
+
+@manager.option('-u', '--username', dest='username')
+@manager.option('-p', '--password', dest='password')
+@manager.option('-e', '--email', dest='email')
+def initdepot(username=None, password=None, email=None):
     """Initializes FlaskBB with all necessary data"""
 
     app.logger.info("Creating default groups...")
@@ -122,8 +117,12 @@ def initflaskbb(username=None, password=None, email=None):
     else:
         create_admin()
 
-    app.logger.info("Creating welcome forum...")
-    create_welcome_forum()
+
+    app.logger.info("Creating normal user...")
+    create_user()
+
+    app.logger.info("Creating sample data...")
+    create_sample_data()
 
     app.logger.info("Congratulations! FlaskBB has been successfully installed")
 
