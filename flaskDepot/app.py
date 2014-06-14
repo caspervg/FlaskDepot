@@ -1,20 +1,25 @@
 from flask import Flask, render_template
-from flask.ext.sqlalchemy import SQLAlchemy
 from flaskdepot.extensions import db, login_manager, mail, migrate
-from flaskdepot.user.views import user
-from flaskdepot.user.models import User, Guest
-from flaskdepot.auth.views import auth
-from flaskdepot.admin.views import admin
-from flaskdepot.file.views import file
+
 
 def configure_blueprints(app):
     """
     Configures the blueprints
     """
+
+    from flaskdepot.user.views import user
+    from flaskdepot.base.views import base
+    # from flaskdepot.auth.views import auth
+    #from flaskdepot.admin.views import admin
+    from flaskdepot.file.views import file
+    from flaskdepot.search.views import search
+
     app.register_blueprint(file, url_prefix=app.config["FILE_PREFIX"])
     app.register_blueprint(user, url_prefix=app.config["USER_PREFIX"])
-    app.register_blueprint(auth, url_prefix=app.config["AUTH_PREFIX"])
-    app.register_blueprint(admin, url_prefix=app.config["ADMIN_PREFIX"])
+    app.register_blueprint(search, url_prefix=app.config["SEARCH_PREFIX"])
+    app.register_blueprint(base)
+    #app.register_blueprint(auth, url_prefix=app.config["AUTH_PREFIX"])
+    #app.register_blueprint(admin, url_prefix=app.config["ADMIN_PREFIX"])
 
 
 def configure_extensions(app):
@@ -25,15 +30,12 @@ def configure_extensions(app):
     migrate.init_app(app, db)
     mail.init_app(app)
 
-    login_manager.login_view = app.config["LOGIN_VIEW"]
-    login_manager.refresh_view = app.config["REATH_VIEW"]
-    login_manager.anonymous_user = Guest
-
     @login_manager.user_loader
     def load_user(user_id):
         """
         Loads the current user for Flask-Login
         """
+        from flaskdepot.user.models import User
         return db.session.query(User).get(user_id)
 
     login_manager.init_app(app)

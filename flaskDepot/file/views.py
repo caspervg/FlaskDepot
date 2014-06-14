@@ -1,16 +1,19 @@
+from datetime import datetime
 import os
-from flask.ext.login import current_user, login_required
-from sqlalchemy import func
-from werkzeug.exceptions import NotAcceptable, abort
-from werkzeug.utils import secure_filename
-from flask import render_template, flash, url_for
+from flask import Blueprint, render_template, flash, abort, send_from_directory, current_app
+from flask.ext.login import login_required, current_user
 from slugify import slugify
-from flaskdepot import app, db
-from flaskdepot.controllers.file import UploadForm, EvaluationForm
-from flaskdepot.models import File, BroadCategory, NarrowCategory, Comment, Vote
+from sqlalchemy import func
+from werkzeug.exceptions import NotAcceptable, NotFound
+from werkzeug.utils import secure_filename
+from flaskdepot.extensions import db
+from flaskdepot.file.controllers import UploadForm, EvaluationForm
+from flaskdepot.file.models import BroadCategory, File, Comment, Vote, Download, NarrowCategory
+
+file = Blueprint("file", __name__)
 
 
-@app.route('/upload/', methods=['GET', 'POST'])
+@file.route('/upload/', methods=['GET', 'POST'])
 @login_required
 def upload():
     form = UploadForm()
@@ -31,14 +34,14 @@ def upload():
         new_file.author_id = current_user.id
 
         package = form.package.data
-        package.save(os.path.join(app.config['FILE_DIR'], secure_filename(package.filename)))
+        package.save(os.path.join(current_app.config['FILE_DIR'], secure_filename(package.filename)))
 
         prev1 = form.image_1.data
-        prev1.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev1.filename)))
+        prev1.save(os.path.join(current_app.config['PREVIEW_DIR'], secure_filename(prev1.filename)))
 
         if len(form.image_2.data.filename) is not 0:
             prev2 = form.image_2.data
-            prev2.save(os.path.join(app.config['PREVIEW_DIR'], secure_filename(prev2.filename)))
+            prev2.save(os.path.join(current_app.config['PREVIEW_DIR'], secure_filename(prev2.filename)))
 
         db.session.add(new_file)
         db.session.commit()
@@ -48,8 +51,8 @@ def upload():
     return render_template('upload.html', form=form, title="Upload")
 
 
-@app.route('/file/<fileid>/<slug>/', methods=['GET', 'POST'])
-@app.route('/file/<fileid>/', methods=['GET', 'POST'])
+@file.route('/<fileid>/<slug>/', methods=['GET', 'POST'])
+@file.route('/<fileid>/', methods=['GET', 'POST'])
 def file_one(fileid, slug=None):
     form = EvaluationForm()
 
@@ -93,11 +96,52 @@ def file_one(fileid, slug=None):
                            title=u'{0} by {1}'.format(_file.name, _file.author.username))
 
 
-@app.route('/file/all/', methods=['GET'])
+@file.route('/all/', methods=['GET'])
 @login_required
 def file_all():
     files = File.query.all()
     ret = ''
-    for afile in files:
-        ret += u'{0} by {1}<br>'.format(afile.name, afile.author.username)
+    for _file in files:
+        ret += u'{0} by {1}<br>'.format(_file.name, _file.author.username)
     return ret
+
+
+@file.route('/preview/<_id>/<number>/')
+def preview(_id, number):
+    _file = File.query.filter_by(id=_id).first()
+    if _file:
+        if int(number) == 1:
+            return send_from_directory(current_app.config['PREVIEW_DIR'], _file.preview1_name)
+        elif int(number) == 2:
+            if _file.preview2_name:
+                return send_from_directory(current_app.config['PREVIEW_DIR'], _file.preview2_name)
+            else:
+                raise NotAcceptable()
+        else:
+            raise NotAcceptable()
+    else:
+        raise NotFound()
+
+
+@login_required
+@file.route('/package/<_id>/')
+def package(_id):
+    _file = File.query.filter_by(id=_id).first()
+    if _file:
+        download = Download.query.filter_by(file_id=_id, user_id=current_user.id).first()
+        if download:
+            download.last_downloaded = datetime.utcnow()
+            download.num_downloaded += 1
+            db.session.commit()
+        else:
+            download = Download()
+            download.file = _file
+            download.user = current_user
+            download.num_downloaded = 1
+            download.last_downloaded = datetime.utcnow()
+            db.session.add(download)
+            db.session.commit()
+
+        return send_from_directory(current_app.config['FILE_DIR'], _file.file_name)
+    else:
+        raise NotFound()

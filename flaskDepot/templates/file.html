@@ -19,14 +19,14 @@
         <div class="row margin-bottom margin-top" id="row-preview">
             {% if upload.preview2_name %}
             <div class="large-6 columns text-center">
-                <img src="{{ url_for('preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
+                <img src="{{ url_for('file.preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
             </div>
             <div class="large-6 columns">
-                <img src="{{ url_for('preview', id=upload.id, number=2) }}" alt="preview image 2" class="preview-img"/>
+                <img src="{{ url_for('file.preview', id=upload.id, number=2) }}" alt="preview image 2" class="preview-img"/>
             </div>
             {% else %}
             <div class="large-12 column text-center">
-                <img src="{{ url_for('preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
+                <img src="{{ url_for('file.preview', id=upload.id, number=1) }}" alt="preview image 1" class="preview-img"/>
             </div>
             {% endif %}
         </div>
@@ -58,9 +58,9 @@
                     <a href="#" class="close">&times;</a>
                 </div>
             {% elif upload.is_featured %}
-                <a href="{{ url_for('package', id=upload.id) }}" class="button success radius">Download Featured File</a>
+                <a href="{{ url_for('file.package', id=upload.id) }}" class="button success radius">Download Featured File</a>
             {% else %}
-                <a href="{{ url_for('package', id=upload.id) }}" class="button radius">Download File</a>
+                <a href="{{ url_for('file.package', id=upload.id) }}" class="button radius">Download File</a>
             {% endif %}
         </div>
         {% if not current_user.is_anonymous() and (current_user.group.is_admin or current_user == upload.author) %}
@@ -97,7 +97,7 @@
             </fieldset>
             <fieldset>
                 <legend>Rate this file</legend>
-                <form method="post" action="{{ url_for('file_one', fileid=upload.id) }}">
+                <form method="post" action="{{ url_for('file.file_one', fileid=upload.id) }}">
                     {{ form.hidden_tag() }}
                     {% if allow_rating %}
                         {{ render_field(form.rating, placeholder='Optional (>= 0 and <= 5)') }}

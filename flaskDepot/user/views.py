@@ -1,6 +1,5 @@
 from flask import render_template, request, flash, url_for, redirect, Blueprint
 from flask_login import login_user, login_required, current_user, logout_user
-from flaskdepot import app
 from flaskdepot.extensions import db
 from flaskdepot.user.models import User, Usergroup
 from flaskdepot.user.controllers import RegistrationForm, LoginForm, AccountEditForm, AccountDeleteForm,\
@@ -13,7 +12,7 @@ user = Blueprint("user", __name__)
 def register():
 
     if current_user.is_authenticated():
-        return redirect(url_for('index'))
+        return redirect(url_for('base.index'))
 
     form = RegistrationForm()
 
@@ -39,7 +38,7 @@ def register():
 @user.route('/login/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    form.next.data = url_for('index')
+    form.next.data = url_for('base.index')
 
     if form.validate_on_submit():
         if not form.remember.data:
@@ -89,19 +88,19 @@ def user_one(id):
 @login_required
 def edit_user(id):
     if current_user.group.is_admin or current_user.id == int(id):
-        user = User.query.filter_by(id=id).first()
+        _user = User.query.filter_by(id=id).first()
         form = AccountEditForm()
 
         if form.validate_on_submit():
             if form.email.data:
-                user.email = form.email.data
+                _user.email = form.email.data
                 flash('The e-mail address has been updated')
             if form.password.data and (form.password.data == form.confirm_password.data):
-                user.set_password(form.password.data)
+                _user.set_password(form.password.data)
                 flash('The password has been updated')
             db.session.commit()
 
-        return render_template('user_edit.html', form=form, title=u"Edit profile for {0}".format(user.username), user=user)
+        return render_template('user_edit.html', form=form, title=u"Edit profile for {0}".format(_user.username), user=_user)
     else:
         return 'You cannot access this page'
 
@@ -130,7 +129,7 @@ def admin_edit_user(id):
         return render_template('admin_user_edit.html', form=form, title=u"Edit account for {0}".format(user.username), user=user)
 
 
-@user.route('/user/<id>/delete/', methods=['GET', 'POST'])
+@user.route('/<id>/delete/', methods=['GET', 'POST'])
 @login_required
 def delete_user(id):
     if current_user.group.is_admin or current_user.id == int(id):
@@ -159,8 +158,6 @@ def delete_user(id):
             return 'You cannot access this page'
 
     return render_template('user_delete.html', form=form, title=u"Delete account for {0}".format(user.username), user=user)
-
-
 
 
 @user.route('/me/', methods=['GET'])
