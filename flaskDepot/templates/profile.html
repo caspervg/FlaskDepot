@@ -13,10 +13,10 @@
 
             <div class="row margin-top">
                 <div class="large-8 large-centered column text-center">
-                    <a href="{{ url_for('user.delete_user', id=user.id) }}" class="button alert">Delete account</a>
                     <a href="{{ url_for('user.edit_user', id=user.id) }}" class="button success">Edit profile</a>
                     {% if current_user.group.is_admin %}
                         <a href="{{ url_for('user.admin_edit_user', id=user.id) }}" class="button">Edit account</a>
+                        <a href="{{ url_for('user.delete_user', id=user.id) }}" class="button alert">Delete account</a>
                     {% endif %}
                 </div>
             </div>
