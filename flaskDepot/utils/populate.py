@@ -49,10 +49,9 @@ def create_sample_data():
 
     db.session.commit()
 
-    user_1 = User.query.filter_by(is_admin=True).first()
-    user_2 = User.query.filter_by(is_default=True).first()
+    user_1 = User.query.join(Usergroup).filter(Usergroup.is_admin).first()
 
-    file = File(name=u'TestFile', description=u'A test file', version=u'1.0', author=user_2,
+    file = File(name=u'TestFile', description=u'A test file', version=u'1.0', author=user_1,
                 num_views=3, file_name='MyTestFile.zip', preview1_name='MyPrev.png', preview2_name='MyPrev.gif',
                 broad_category=broadcat, narrow_category=narrwcat)
     db.session.add(file)
@@ -63,15 +62,11 @@ def create_sample_data():
     db.session.add(comment)
 
     dl_1 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_1)
-    dl_2 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_2)
+    dl_2 = Download(last_downloaded=datetime.datetime.utcnow(), file=file, user=user_1)
     db.session.add(dl_1)
     db.session.add(dl_2)
 
-    vote_1 = Vote(value=-3, file=file, user=user_1)
-    vote_2 = Vote(value=7, file=file, user=user_2)
-    vote_3 = Vote(value=-2, file=file, user=user_1)
+    vote_1 = Vote(value=7, file=file, user=user_1)
     db.session.add(vote_1)
-    db.session.add(vote_2)
-    db.session.add(vote_3)
 
     db.session.commit()
