@@ -33,15 +33,22 @@ def upload():
         new_file.narrow_category_id = form.narrow_category.data
         new_file.author_id = current_user.id
 
-        package = form.package.data
-        package.save(os.path.join(current_app.config['FILE_DIR'], secure_filename(package.filename)))
+        # Create subdirectories for images and previews based on slug
+        file_subdir = os.path.join(current_app.config['FILE_DIR'], new_file.slug)
+        image_subdir = os.path.join(current_app.config['PREVIEW_DIR'], new_file.slug)
+        if not os.path.exists(file_subdir):
+            os.makedirs(file_subdir)
+        if not os.path.exists(image_subdir):
+            os.makedirs(image_subdir)
+
+        form.package.data.save(os.path.join(file_subdir, new_file.file_name))
 
         prev1 = form.image_1.data
-        prev1.save(os.path.join(current_app.config['PREVIEW_DIR'], secure_filename(prev1.filename)))
+        prev1.save(os.path.join(image_subdir, new_file.preview1_name))
 
         if len(form.image_2.data.filename) is not 0:
             prev2 = form.image_2.data
-            prev2.save(os.path.join(current_app.config['PREVIEW_DIR'], secure_filename(prev2.filename)))
+            prev2.save(os.path.join(image_subdir, new_file.preview2_name))
 
         db.session.add(new_file)
         db.session.commit()
@@ -111,10 +118,10 @@ def preview(id, number):
     _file = File.query.filter_by(id=id).first()
     if _file:
         if int(number) == 1:
-            return send_from_directory(current_app.config['PREVIEW_DIR'], _file.preview1_name)
+            return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug), _file.preview1_name)
         elif int(number) == 2:
             if _file.preview2_name:
-                return send_from_directory(current_app.config['PREVIEW_DIR'], _file.preview2_name)
+                return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug), _file.preview2_name)
             else:
                 raise NotAcceptable()
         else:
@@ -142,6 +149,6 @@ def package(id):
             db.session.add(download)
             db.session.commit()
 
-        return send_from_directory(current_app.config['FILE_DIR'], _file.file_name)
+        return send_from_directory(os.path.join(current_app.config['FILE_DIR'], _file.slug), _file.file_name)
     else:
         raise NotFound()
