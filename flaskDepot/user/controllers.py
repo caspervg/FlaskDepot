@@ -23,7 +23,12 @@ class LoginForm(RedirectForm):
             return False
 
         if self.username.data:
-            user = User.query.filter(db.func.lower(User.username) == db.func.lower(self.username.data)).first()
+            user = User\
+                .query\
+                .filter(db.func.lower(User.username) == db.func.lower(self.username.data))\
+                .filter_by(active=True)\
+                .first()
+
             if not user:
                 self.username.errors.append('No user with that username exists.'
                                             ' Make sure that you have typed it correctly.')
@@ -91,8 +96,6 @@ class AccountEditForm(RedirectForm):
 # User Delete Account
 class AccountDeleteForm(RedirectForm):
     username = TextField('Username', validators=[Required()])
-    password = PasswordField('Password', validators=[Length(4, 64)])
-
 
 # Admin Edit Account
 class AdminAccountEditForm(RedirectForm):

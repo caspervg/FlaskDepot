@@ -1,4 +1,4 @@
-from flask import render_template, request, flash, url_for, redirect, Blueprint
+from flask import render_template, request, flash, url_for, redirect, Blueprint, abort
 from flask_login import login_user, login_required, current_user, logout_user
 from flaskdepot.extensions import db
 from flaskdepot.user.models import User, Usergroup
@@ -109,55 +109,45 @@ def edit_user(id):
 @login_required
 def admin_edit_user(id):
     if not current_user.group.is_admin:
-        return 'You cannot access this page'
+        abort(403)
     else:
-        user = User.query.filter_by(id=id).first()
+        _user = User.query.filter_by(id=id).first()
         form = AdminAccountEditForm()
         form.group.choices = [(group.id, group.name) for group in Usergroup.query.order_by('name')]
 
         if form.validate_on_submit():
-            if form.group.data and form.group.data is not user.group.id:
-                user.group_id = form.group.data
+            if form.group.data and form.group.data is not _user.group.id:
+                _user.group_id = form.group.data
                 flash('The user group has been updated')
             if form.username.data:
-                user.username = form.username.data
+                _user.username = form.username.data
                 flash('The username has been updated')
             db.session.commit()
         else:
-            form.group.data = user.group_id
+            form.group.data = _user.group_id
 
-        return render_template('admin_user_edit.html', form=form, title=u"Edit account for {0}".format(user.username), user=user)
+        return render_template('admin_user_edit.html', form=form, title=u"Edit account for {0}".format(_user.username), user=_user)
 
 
 @user.route('/<id>/delete/', methods=['GET', 'POST'])
 @login_required
 def delete_user(id):
-    if current_user.group.is_admin or current_user.id == int(id):
-        user = User.query.filter_by(id=id).first()
+    if not current_user.group.is_admin:
+        abort(403)
+    else:
+        _user = User.query.filter_by(id=id).first()
         form = AccountDeleteForm()
 
         if form.validate_on_submit():
-            if current_user.group.is_admin:
-                if user.username == form.username.data:
-                    user.active = False
-                    db.session.commit()
-                else:
-                    form.username.errors.append('Please enter the correct username')
-                    form.redirect()
+            if _user.username == form.username.data:
+                _user.active = False
+                db.session.commit()
             else:
-                if user.username == form.username.data:
-                    if user.check_password(form.password.data):
-                        user.active = False
-                        db.session.commit()
-                    else:
-                        form.password.errors.append('Username and password did not match')
-                else:
-                    form.username.errors.append('Please enter the correct username')
-                    form.redirect()
+                form.username.errors.append('Please enter the correct username')
+                form.redirect()
         else:
-            return 'You cannot access this page'
-
-    return render_template('user_delete.html', form=form, title=u"Delete account for {0}".format(user.username), user=user)
+            return render_template('user_delete.html', form=form,
+                                   title=u"Delete account for {0}".format(_user.username), user=_user)
 
 
 @user.route('/me/', methods=['GET'])
