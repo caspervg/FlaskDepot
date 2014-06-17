@@ -31,7 +31,7 @@ def register():
 
         return form.redirect()
     else:
-        return render_template('register.html', form=form, title=u'Registration')
+        return render_template('user/register.html', form=form, title=u'Registration')
 
 
 @user.route('/login/', methods=['GET', 'POST'])
@@ -48,7 +48,7 @@ def login():
         flash(u'You have been logged in as {0}'.format(form.user.username))
         return form.redirect()
     else:
-        return render_template('login.html', form=form, title=u'Log in')
+        return render_template('user/login.html', form=form, title=u'Log in')
 
 
 @user.route('/logout/', methods=['GET'])
@@ -78,7 +78,7 @@ def user_all():
 def user_one(id):
     if current_user.group.is_admin or current_user.id == int(id):
         user = User.query.filter_by(id=id).first()
-        return render_template('profile.html', user=user, title=u"Profile for {0}".format(user.username))
+        return render_template('user/profile.html', user=user, title=u"Profile for {0}".format(user.username))
     else:
         return 'You cannot access this page'
 
@@ -99,7 +99,7 @@ def edit_user(id):
                 flash('The password has been updated')
             db.session.commit()
 
-        return render_template('user_edit.html', form=form, title=u"Edit profile for {0}".format(_user.username), user=_user)
+        return render_template('user/edit.html', form=form, title=u"Edit profile for {0}".format(_user.username), user=_user)
     else:
         return 'You cannot access this page'
 
@@ -121,7 +121,7 @@ def delete_user(id):
                 form.username.errors.append('Please enter the correct username')
                 form.redirect()
         else:
-            return render_template('user_delete.html', form=form,
+            return render_template('user/delete.html', form=form,
                                    title=u"Delete account for {0}".format(_user.username), user=_user)
 
 

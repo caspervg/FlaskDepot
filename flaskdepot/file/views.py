@@ -55,7 +55,7 @@ def upload():
 
         flash('File has been uploaded')
 
-    return render_template('upload.html', form=form, title="Upload")
+    return render_template('file/upload.html', form=form, title="Upload")
 
 
 @file.route('/<fileid>/<slug>/', methods=['GET', 'POST'])
@@ -94,7 +94,7 @@ def file_one(fileid, slug=None):
     num_rating = db.session.query(func.count(Vote.id)).filter_by(file_id=fileid).scalar()
     avg_rating = db.session.query(func.avg(Vote.value)).filter_by(file_id=fileid).scalar()
 
-    return render_template('file.html',
+    return render_template('file/file.html',
                            upload=_file,
                            form=form,
                            allow_rating=allow_rating,

@@ -65,7 +65,7 @@ def create_admin(username=None, password=None, email=None):
     if not (username and password and email):
         username = prompt("Username")
         email = prompt("A valid email address")
-        password = prompt_pass("Password")
+        password = prompt("Password")
 
     create_admin_user(username=username, password=password, email=email)
 
@@ -79,7 +79,7 @@ def create_user(username=None, password=None, email=None):
     if not (username and password and email):
         username = prompt("Username")
         email = prompt("A valid email address")
-        password = prompt_pass("Password")
+        password = prompt("Password")
 
     create_normal_user(username=username, password=password, email=email)
 
@@ -88,7 +88,7 @@ def create_user(username=None, password=None, email=None):
 @manager.option('-p', '--password', dest='password')
 @manager.option('-e', '--email', dest='email')
 def initdepot(username=None, password=None, email=None):
-    """Initializes FlaskBB with all necessary data"""
+    """Initializes FlaskDepot with all necessary data"""
 
     app.logger.info("Creating default groups...")
     try:

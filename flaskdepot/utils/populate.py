@@ -8,10 +8,10 @@ def create_default_groups():
     banned = Usergroup(name=u'Banned', is_banned=True)
     db.session.add(banned)
 
-    member = Usergroup(name=u'Member', is_default=True)
+    member = Usergroup(name=u'Member', is_default=True, is_uploader=True)
     db.session.add(member)
 
-    admin = Usergroup(name=u'Admin', is_admin=True)
+    admin = Usergroup(name=u'Admin', is_admin=True, is_uploader=True)
     db.session.add(admin)
 
     guest = Usergroup(name=u'Guest')

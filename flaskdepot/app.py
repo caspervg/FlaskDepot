@@ -36,7 +36,6 @@ def configure_extensions(app):
         """
         from flaskdepot.user.models import User
         return db.session.query(User).filter_by(active=True, id=user_id).first()
-
     login_manager.init_app(app)
 
 

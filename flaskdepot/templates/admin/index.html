@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'administration' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <div class="row">
+            <div class="large-12 columns">
+                <h3>Administration</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-4 columns">
+                <a href="{{ url_for('admin.user') }}" class="button">User Administration</a>
+            </div>
+            <div class="large-4 columns">
+                <a href="{{ url_for('admin.file') }}" class="button">File Administration</a>
+            </div>
+            <div class="large-4 columns">
+                <a href="{{ url_for('admin.category') }}" class="button">Category Administration</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="large-12 columns">
+                <h3>Quick Statistics</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-centered large-12 columns">
+                <table width="100%">
+                    <tbody>
+                    {% for stat in stats %}
+                        <tr>
+                            <td><b>{{ stat.name }}</b></td>
+                            <td>{{ stat.result }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{ flashes() }}
+    </div>
+{% endblock %}

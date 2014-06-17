@@ -31,6 +31,16 @@
     </div>
 {% endmacro %}
 
+{% macro render_boolean(value) %}
+    {% if value is none %}
+        <span class="secondary label radius">N/A</span>
+    {% elif value %}
+        <span class="success label radius">{{ value }}</span>
+    {% else %}
+        <span class="alert label radius">{{ value }}</span>
+    {% endif %}
+{% endmacro %}
+
 {% macro flashes() %}
 <div class="row">
     <div class="large-12 columns">

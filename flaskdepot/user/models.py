@@ -61,3 +61,4 @@ class Usergroup(db.Model):
     is_default = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
     is_admin = db.Column(db.Boolean, default=False)
+    is_uploader = db.Column(db.Boolean, default=False)

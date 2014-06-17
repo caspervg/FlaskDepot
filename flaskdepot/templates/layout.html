@@ -40,10 +40,14 @@
 
                 <ul class="left">
                     {{ render_nav('base.index', 'index', 'Index', active_page) }}
-                    {{ render_nav('search.search_index', 'search', 'Search', active_page) }}
-                    {{ render_nav('file.file_all', 'file_all', 'All Files', active_page) }}
-                    {{ render_nav('file.upload', 'upload', 'Upload File', active_page) }}
+                    {{ render_nav('search.index', 'search_index', 'Search', active_page) }}
                     {% if current_user.is_authenticated() %}
+                        {% if current_user.group.is_admin %}
+                            {{ render_nav('admin.index', 'admin_index', 'Administration', active_page) }}
+                        {% endif %}
+                        {% if current_user.group.is_uploader %}
+                            {{ render_nav('file.upload', 'upload', 'Upload File', active_page) }}
+                        {% endif %}
                         <li class="has-dropdown"><a href="#">User Tools</a>
                             <ul class="dropdown">
                                 {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
