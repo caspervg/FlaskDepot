@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_boolean, flashes, format_date %}
+{% set activepage = 'administration' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <div class="row max-width">
+            <div class="large-12 columns">
+                <h3>File administration</h3>
+            </div>
+        </div>
+        <div class="row max-width">
+            <div class="large-centered large-12 columns">
+                <table width="100%">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Locked</th>
+                        <th>Deleted</th>
+                        <th>Featured</th>
+                        <th>Private</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Downloads</th>
+                        <th>Views</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for file in files %}
+                        <tr>
+                            <td>{{ file.id }}</td>
+                            <td><a href="{{ url_for('admin.edit_file', id=file.id) }}">{{ file.name }}</a></td>
+                            <td>{{ file.author.username }}</td>
+                            <td>{{ render_boolean(file.is_locked) }}</td>
+                            <td>{{ render_boolean(file.is_deleted) }}</td>
+                            <td>{{ render_boolean(file.is_featured) }}</td>
+                            <td>{{ render_boolean(file.is_private) }}</td>
+                            <td>{{ format_date(file.created_on) }}</td>
+                            <td>{{ format_date(file.updated_on) }}</td>
+                            <td>{{ file.num_downloads }}</td>
+                            <td>{{ file.num_views }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {{ flashes() }}
+    </div>
+{% endblock %}

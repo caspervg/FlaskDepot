@@ -51,7 +51,8 @@ def user():
 @admin.route('/file', methods=['GET'])
 @login_required
 def file():
-    return 'File admin'
+    files = File.query.all()
+    return render_template('admin/file.html', files=files, title="File administration")
 
 
 @admin.route('/category', methods=['GET'])
@@ -60,7 +61,13 @@ def category():
     return 'Category admin'
 
 
-@admin.route('/user/<id>/edit/', methods=['GET', 'POST'])
+@admin.route('/file/<id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_file(id):
+    return 'Edit file'
+
+
+@admin.route('/user/<id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_user(id):
     _user = User.query.filter_by(id=id).first()
