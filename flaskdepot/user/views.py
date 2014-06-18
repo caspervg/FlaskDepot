@@ -60,19 +60,6 @@ def logout():
 
 
 # User Profile
-@user.route('/all/', methods=['GET'])
-@login_required
-def user_all():
-    if current_user.group.is_admin:
-        users = User.query.all()
-        ret = ''
-        for user in users:
-            ret += u'{0}<br>'.format(user.username)
-        return ret
-    else:
-        return 'You cannot access this page'
-
-
 @user.route('/<id>/', methods=['GET'])
 @login_required
 def user_one(id):
