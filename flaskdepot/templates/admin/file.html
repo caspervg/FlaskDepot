@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "_helpers.html" import render_boolean, flashes, format_date %}
+{% from "_helpers.html" import render_boolean, flashes, format_date, render_pagination %}
 {% set activepage = 'administration' %}
 
 {% block content %}
@@ -28,7 +28,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for file in files %}
+                    {% for file in files.items %}
                         <tr>
                             <td>{{ file.id }}</td>
                             <td><a href="{{ url_for('admin.edit_file', id=file.id) }}">{{ file.name }}</a></td>
@@ -45,6 +45,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <h5>Pages</h5>
+                {{ render_pagination(files, 'admin.files') }}
             </div>
         </div>
         {{ flashes() }}

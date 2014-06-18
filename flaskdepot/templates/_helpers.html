@@ -80,6 +80,37 @@
 </div>
 {% endmacro %}
 
+<!-- Previous, Next Pagination -->
+{% macro pagination(endpoint, result) %}
+    {% if result.has_prev %}
+        <a href="{{ url_for(endpoint, page = result.prev_num) }}"><< Previous page</a>
+    {% else %}
+        << Previous page
+    {% endif %} |
+    {% if result.has_next %}
+        <a href="{{ url_for(endpoint, page = result.next_num) }}">Next page >></a>
+    {% else %}
+        Next page >>
+    {% endif %}
+{% endmacro %}
+
+<!-- List of pages -->
+{% macro render_pagination(pagination, endpoint) %}
+    <div class="pagination">
+        {%- for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class="ellipsis">…</span>
+            {% endif %}
+        {%- endfor %}
+    </div>
+{% endmacro %}
+
 {% macro format_date(date) %}
 {% if date %}
     {{ date.strftime("%Y-%m-%d") }}

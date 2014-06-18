@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, flash, render_template
+from flask import Blueprint, abort, flash, render_template, current_app
 from flask.ext.login import login_required, current_user
 from sqlalchemy import func
 from flaskdepot.admin.controllers import AdminAccountEditForm
@@ -7,6 +7,7 @@ from flaskdepot.file.models import Download, File, Vote, Comment
 from flaskdepot.user.models import User, Usergroup
 
 admin = Blueprint("admin", __name__)
+
 
 @admin.before_request
 def check_admin():
@@ -41,17 +42,20 @@ def index():
 
     return render_template('admin/index.html', stats=stats, title="Administration")
 
+
 @admin.route('/user', methods=['GET'])
+@admin.route('/user/<int:page>', methods=['GET'])
 @login_required
-def user():
-    users = User.query.filter_by(active=True).all()
+def user(page=1):
+    users = User.query.filter_by(active=True).paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
     return render_template('admin/user.html', users=users, title="User administration")
 
 
 @admin.route('/file', methods=['GET'])
+@admin.route('/file/<int:page>', methods=['GET'])
 @login_required
-def file():
-    files = File.query.all()
+def file(page=1):
+    files = File.query.paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
     return render_template('admin/file.html', files=files, title="File administration")
 
 

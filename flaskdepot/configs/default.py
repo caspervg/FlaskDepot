@@ -54,3 +54,6 @@ class DefaultConfig(object):
     AUTH_PREFIX = '/auth'
     ADMIN_PREFIX = '/admin'
     SEARCH_PREFIX = '/search'
+
+    # Results per page (search results, administrative lists, etc.)
+    RESULTS_PER_PAGE = 15
