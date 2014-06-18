@@ -56,7 +56,7 @@ def login():
 def logout():
     logout_user()
     flash(u'You have been logged out')
-    return 'Logged out'
+    return redirect(url_for('base.index'))
 
 
 # User Profile
