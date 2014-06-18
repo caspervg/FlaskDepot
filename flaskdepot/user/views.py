@@ -115,4 +115,4 @@ def delete_user(id):
 @user.route('/me/', methods=['GET'])
 @login_required
 def user_me():
-    return user_one(current_user.id)
+    return redirect(url_for('user.user_one', id=current_user.id))
