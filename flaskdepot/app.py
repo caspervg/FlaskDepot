@@ -80,6 +80,11 @@ def configure_requests(app):
     pass
 
 
+def configure_jinja(app):
+    app.jinja_env.trim_blocks = True
+    app.jinja_env.lstrip_blocks = True
+
+
 def create_app(config=None):
     """
     Creates the application
@@ -97,6 +102,7 @@ def create_app(config=None):
     configure_extensions(app)
     configure_filters(app)
     configure_handlers(app)
+    configure_jinja(app)
     configure_requests(app)
 
     return app
