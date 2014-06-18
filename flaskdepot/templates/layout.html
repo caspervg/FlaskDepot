@@ -48,12 +48,7 @@
                         {% if current_user.group.is_uploader %}
                             {{ render_nav('file.upload', 'upload', 'Upload File', active_page) }}
                         {% endif %}
-                        <li class="has-dropdown"><a href="#">User Tools</a>
-                            <ul class="dropdown">
-                                {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
-                                {{ render_nav('user.user_all', 'userall', 'All Users', active_page) }}
-                            </ul>
-                        </li>
+                        {{ render_nav('user.user_me', 'profile', 'Profile', active_page) }}
                     {% endif %}
                 </ul>
             </section>
