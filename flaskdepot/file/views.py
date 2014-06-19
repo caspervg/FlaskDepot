@@ -118,10 +118,15 @@ def preview(id, number):
     _file = File.query.filter_by(id=id).first()
     if _file:
         if int(number) == 1:
-            return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug), _file.preview1_name)
+            if _file.preview1_name:
+                return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug),
+                                           _file.preview1_name)
+            else:
+                raise NotFound()
         elif int(number) == 2:
             if _file.preview2_name:
-                return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug), _file.preview2_name)
+                return send_from_directory(os.path.join(current_app.config['PREVIEW_DIR'], _file.slug),
+                                           _file.preview2_name)
             else:
                 raise NotAcceptable()
         else:
