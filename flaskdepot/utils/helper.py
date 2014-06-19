@@ -15,3 +15,11 @@ def url_for(endpoint, **values):
             if not k in values.keys():
                 values[k] = v
     return flask_url_for(endpoint, **values)
+
+
+def likeable(s):
+    """
+    Prepends and appends a percent (%) symbol to a string, to make it useful in SQLAlchemy (i)like filters
+        :param s: string to adjust
+    """
+    return '%{0}%'.format(s)
