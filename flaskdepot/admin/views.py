@@ -45,7 +45,7 @@ def index():
 
 
 @admin.route('/user', methods=['GET'])
-@admin.route('/user/<int:page>', methods=['GET'])
+@admin.route('/user/page-<int:page>', methods=['GET'])
 @login_required
 def user(page=1):
     users = User.query
@@ -66,7 +66,7 @@ def user(page=1):
 
 
 @admin.route('/file', methods=['GET'])
-@admin.route('/file/<int:page>', methods=['GET'])
+@admin.route('/file/page-<int:page>', methods=['GET'])
 @login_required
 def file(page=1):
     files = File.query
