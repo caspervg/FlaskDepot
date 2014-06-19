@@ -4,51 +4,76 @@
 
 {% block content %}
     <div class="panel clearfix">
-        <div class="row max-width">
-            <div class="large-12 columns">
-                <h3>File administration</h3>
-            </div>
-        </div>
-        <div class="row max-width">
-            <div class="large-centered large-12 columns">
-                <table width="100%">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Author</th>
-                        <th>Locked</th>
-                        <th>Deleted</th>
-                        <th>Featured</th>
-                        <th>Private</th>
-                        <th>Created</th>
-                        <th>Updated</th>
-                        <th>Downloads</th>
-                        <th>Views</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for file in files.items %}
+        <fieldset>
+            <legend>File administration</legend>
+            <div class="row max-width">
+                <div class="large-centered large-12 columns">
+                    <table width="100%">
+                        <thead>
                         <tr>
-                            <td>{{ file.id }}</td>
-                            <td><a href="{{ url_for('admin.edit_file', id=file.id) }}">{{ file.name }}</a></td>
-                            <td>{{ file.author.username }}</td>
-                            <td>{{ render_boolean(file.is_locked) }}</td>
-                            <td>{{ render_boolean(file.is_deleted) }}</td>
-                            <td>{{ render_boolean(file.is_featured) }}</td>
-                            <td>{{ render_boolean(file.is_private) }}</td>
-                            <td>{{ format_date(file.created_on) }}</td>
-                            <td>{{ format_date(file.updated_on) }}</td>
-                            <td>{{ file.num_downloads }}</td>
-                            <td>{{ file.num_views }}</td>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Author</th>
+                            <th>Locked</th>
+                            <th>Deleted</th>
+                            <th>Featured</th>
+                            <th>Private</th>
+                            <th>Created</th>
+                            <th>Updated</th>
+                            <th>Downloads</th>
+                            <th>Views</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <h5>Pages</h5>
-                {{ render_pagination(files, 'admin.files') }}
+                        </thead>
+                        <tbody>
+                        {% for file in files.items %}
+                            <tr>
+                                <td>{{ file.id }}</td>
+                                <td><a href="{{ url_for('admin.edit_file', id=file.id) }}">{{ file.name }}</a></td>
+                                <td>{{ file.author.username }}</td>
+                                <td>{{ render_boolean(file.is_locked) }}</td>
+                                <td>{{ render_boolean(file.is_deleted) }}</td>
+                                <td>{{ render_boolean(file.is_featured) }}</td>
+                                <td>{{ render_boolean(file.is_private) }}</td>
+                                <td>{{ format_date(file.created_on) }}</td>
+                                <td>{{ format_date(file.updated_on) }}</td>
+                                <td>{{ file.num_downloads }}</td>
+                                <td>{{ file.num_views }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <h5>Pages</h5>
+                    {{ render_pagination(files, 'admin.files') }}
+                </div>
             </div>
-        </div>
+        </fieldset>
+        <fieldset>
+            <legend>Search files</legend>
+            <form method="get">
+                <div class="row">
+                    <div class="large-6 columns">
+                        <label>Filename
+                            <input type="text" placeholder="Filename" name="filename">
+                        </label>
+                    </div>
+                    <div class="large-6 columns">
+                        <label>Author
+                            <select name="author">
+                            <option value="" selected></option>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 large-centered columns">
+                        <button type="submit" class="button">Search files</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
         {{ flashes() }}
     </div>
 {% endblock %}

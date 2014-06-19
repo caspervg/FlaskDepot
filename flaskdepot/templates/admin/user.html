@@ -4,53 +4,83 @@
 
 {% block content %}
     <div class="panel clearfix">
-        <div class="row max-width">
-            <div class="large-12 columns">
-                <h3>User administration</h3>
+        <fieldset>
+            <legend>User administration</legend>
+            <div class="row max-width">
+                <div class="large-centered large-12 columns">
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>E-mail</th>
+                                <th>Admin</th>
+                                <th>Uploader</th>
+                                <th>Banned</th>
+                                <th>Registered</th>
+                                <th>Last active</th>
+                                <th>Files</th>
+                                <th>Downloads</th>
+                                <th>Comments</th>
+                                <th>Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in users.items %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td><a href="{{ url_for('admin.edit_user', id=user.id) }}">{{ user.username }}</a></td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ render_boolean(user.group.is_admin) }}</td>
+                                <td>{{ render_boolean(user.group.is_uploader) }}</td>
+                                <td>{{ render_boolean(user.group.is_banned) }}</td>
+                                <td>{{ format_date(user.created_on) }}</td>
+                                <td>{{ format_date(user.last_active_on) }}</td>
+                                <td>{{ user.files.all()|count }}</td>
+                                <td>{{ user.downloads.all()|count }}</td>
+                                <td>{{ user.comments.all()|count }}</td>
+                                <td>{{ user.votes.all()|count }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <h5>Pages</h5>
+                    {{ render_pagination(users, 'admin.user') }}
+                </div>
             </div>
-        </div>
-        <div class="row max-width">
-            <div class="large-centered large-12 columns">
-                <table width="100%">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>E-mail</th>
-                            <th>Admin</th>
-                            <th>Uploader</th>
-                            <th>Banned</th>
-                            <th>Registered</th>
-                            <th>Last active</th>
-                            <th>Files</th>
-                            <th>Downloads</th>
-                            <th>Comments</th>
-                            <th>Votes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for user in users.items %}
-                        <tr>
-                            <td>{{ user.id }}</td>
-                            <td><a href="{{ url_for('admin.edit_user', id=user.id) }}">{{ user.username }}</a></td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ render_boolean(user.group.is_admin) }}</td>
-                            <td>{{ render_boolean(user.group.is_uploader) }}</td>
-                            <td>{{ render_boolean(user.group.is_banned) }}</td>
-                            <td>{{ format_date(user.created_on) }}</td>
-                            <td>{{ format_date(user.last_active_on) }}</td>
-                            <td>{{ user.files.all()|count }}</td>
-                            <td>{{ user.downloads.all()|count }}</td>
-                            <td>{{ user.comments.all()|count }}</td>
-                            <td>{{ user.votes.all()|count }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <h5>Pages</h5>
-                {{ render_pagination(users, 'admin.user') }}
-            </div>
-        </div>
+        </fieldset>
+        <fieldset>
+            <legend>Search users</legend>
+            <form method="get">
+                <div class="row">
+                    <div class="large-4 columns">
+                        <label>Username
+                            <input type="text" placeholder="Username" name="username">
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label>E-mail
+                            <input type="text" placeholder="E-mail" name="email">
+                        </label>
+                    </div>
+                    <div class="large-4 columns">
+                        <label>Usergroup
+                            <select name="usergroup">
+                                <option value="" selected></option>
+                                {% for group in usergroups %}
+                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="large-12 large-centered columns">
+                        <button type="submit" class="button">Search users</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
         {{ flashes() }}
     </div>
 {% endblock %}

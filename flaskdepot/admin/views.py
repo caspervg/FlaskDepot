@@ -5,6 +5,7 @@ from flaskdepot.admin.controllers import AdminAccountEditForm
 from flaskdepot.extensions import db
 from flaskdepot.file.models import Download, File, Vote, Comment
 from flaskdepot.user.models import User, Usergroup
+from flaskdepot.utils.helper import likeable
 
 admin = Blueprint("admin", __name__)
 
@@ -44,24 +45,46 @@ def index():
 
 
 @admin.route('/user', methods=['GET'])
+@admin.route('/user/<int:page>', methods=['GET'])
 @login_required
-def user():
-    users = None
-    if request.args.get('search'):
-        users = User.query.filter_by(active=True, username=request.args.get('search'))
-    else:
-        users = User.query.filter_by(active=True)
-    page = int(request.args.get('page')) if request.args.get('page') else 1
+def user(page=1):
+    users = User.query
+    _username = request.args.get('username')
+    _email = request.args.get('email')
+    _usergroup = request.args.get('usergroup')
+
+    if _username and len(_username) > 0:
+        users = users.filter(User.username.ilike(likeable(_username)))
+    if _email and len(_email) > 0:
+        users = users.filter(User.email.ilike(likeable(_email)))
+    if _usergroup and len(_usergroup) > 0:
+        users = users.filter(User.group_id.is_(_usergroup))
+
     users = users.paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
-    return render_template('admin/user.html', users=users, title="User administration")
+    usergroups = Usergroup.query.all()
+    return render_template('admin/user.html', users=users, usergroups=usergroups, title="User administration")
 
 
 @admin.route('/file', methods=['GET'])
 @admin.route('/file/<int:page>', methods=['GET'])
 @login_required
 def file(page=1):
-    files = File.query.paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
-    return render_template('admin/file.html', files=files, title="File administration")
+    files = File.query
+    _filename = request.args.get('filename')
+    _author = request.args.get('author')
+
+    if _filename and len(_filename) > 0:
+        files = files.filter(File.file_name.ilike(likeable(_filename)))
+    if _author and len(_author) > 0:
+        files = files.filter(File.author_id.is_(_author))
+
+    files = files.paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
+    users = db.session.query(User)\
+        .join(Usergroup)\
+        .filter(Usergroup.is_uploader)\
+        .filter(User.group_id == Usergroup.id)\
+        .all()
+    return render_template('admin/file.html', files=files, users=users, title="File administration")
 
 
 @admin.route('/category', methods=['GET'])
