@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flaskdepot.extensions import db, login_manager, mail, migrate
+from flaskdepot.utils.helper import url_for
 
 
 def configure_blueprints(app):
@@ -40,7 +41,8 @@ def configure_extensions(app):
 
 
 def configure_filters(app):
-    pass
+    # Use custom url_for that supports runtime parameters
+    app.jinja_env.globals['url_for'] = url_for
 
 
 def configure_handlers(app):
