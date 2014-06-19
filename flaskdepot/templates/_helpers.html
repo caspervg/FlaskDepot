@@ -100,7 +100,7 @@
         {%- for page in pagination.iter_pages() %}
             {% if page %}
                 {% if page != pagination.page %}
-                    <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+                    <a href="{{ url_for(endpoint, page=page, _params=request.args.to_dict()) }}">{{ page }}</a>
                 {% else %}
                     <strong>{{ page }}</strong>
                 {% endif %}

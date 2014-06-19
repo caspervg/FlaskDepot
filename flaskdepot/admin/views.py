@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, flash, render_template, current_app
+from flask import Blueprint, abort, flash, render_template, current_app, request
 from flask.ext.login import login_required, current_user
 from sqlalchemy import func
 from flaskdepot.admin.controllers import AdminAccountEditForm
@@ -44,10 +44,15 @@ def index():
 
 
 @admin.route('/user', methods=['GET'])
-@admin.route('/user/<int:page>', methods=['GET'])
 @login_required
-def user(page=1):
-    users = User.query.filter_by(active=True).paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
+def user():
+    users = None
+    if request.args.get('search'):
+        users = User.query.filter_by(active=True, username=request.args.get('search'))
+    else:
+        users = User.query.filter_by(active=True)
+    page = int(request.args.get('page')) if request.args.get('page') else 1
+    users = users.paginate(page, current_app.config['RESULTS_PER_PAGE'], False)
     return render_template('admin/user.html', users=users, title="User administration")
 
 
