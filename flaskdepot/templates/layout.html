@@ -33,6 +33,9 @@
                         </li>
                     {% else %}
                         <li class="has-form">
+                            <a href="{{ url_for('user.register') }}" class="button">Register</a>
+                        </li>
+                        <li class="has-form">
                             <a href="{{ url_for('user.login') }}" class="button">Log in</a>
                         </li>
                     {% endif %}
