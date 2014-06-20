@@ -1,3 +1,4 @@
+import datetime
 from flask import render_template, request, flash, url_for, redirect, Blueprint, abort
 from flask_login import login_user, login_required, current_user, logout_user
 from flaskdepot.extensions import db
@@ -42,6 +43,9 @@ def login():
     if form.validate_on_submit():
         if not form.remember.data:
             login_user(form.user)
+            form.user.last_active_ip = request.remote_addr
+            form.user.last_active_on = datetime.datetime.now()
+            db.session.commit()
         else:
             login_user(form.user, remember=form.remember.data)
 
