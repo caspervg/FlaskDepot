@@ -46,26 +46,34 @@ class UploadForm(RedirectForm):
                 self.filename.errors.append('A file with this name already exists.')
                 validate = False
 
-        """
-        Not required because files will be saved in separate directories now
-
-        if self.package.data:
-            other_file = File.query.filter_by(file_name=secure_filename(self.package.data.filename)).first()
-            if other_file:
-                self.package.errors.append('A package (.zip, .rar) with this name already exists.')
-                validate = False
-
-        for image in [self.image_1, self.image_2]:
-            i_file = image.data
-            if file is not None:
-                o_file1 = File.query.filter_by(preview1_name=secure_filename(i_file.filename)).first()
-                o_file2 = File.query.filter_by(preview2_name=secure_filename(i_file.filename)).first()
-                if o_file1 or o_file2:
-                    image.errors.append('A preview image with this name already exists.')
-                    validate = False
-        """
-
         return validate
+
+
+class EditForm(RedirectForm):
+    package = FileField('File', validators=[
+        FileAllowed(['zip', 'rar'], message="You can only upload compressed (.zip, .rar) files.")])
+
+    image_1 = FileField('Preview 1', validators=[
+        FileAllowed(['png', 'jpg', 'gif'], message="You can only upload image (.png, .jpg, .gif) files.")
+    ])
+
+    image_2 = FileField('Preview 2', validators=[
+        FileAllowed(['png', 'jpg', 'gif'], message="You can only upload image (.png, .jpg, .gif) files.")
+    ])
+
+    version = TextField('Version', default='1.0')
+
+    description = TextAreaField('Description', validators=[
+        Required("Please enter a description for your file.")
+    ])
+
+    broad_category = SelectField('Broad Category', coerce=int, validators=[
+        Required("Please enter a broad category for your file.")
+    ])
+
+    narrow_category = SelectField('Narrow Category', coerce=int, validators=[
+        Required("Please enter a narrow category for your file")
+    ])
 
 
 class EvaluationForm(RedirectForm):

@@ -1,13 +1,13 @@
 from datetime import datetime
 import os
-from flask import Blueprint, render_template, flash, abort, send_from_directory, current_app
+from flask import Blueprint, render_template, flash, abort, send_from_directory, current_app, url_for
 from flask.ext.login import login_required, current_user
 from slugify import slugify
 from sqlalchemy import func
-from werkzeug.exceptions import NotAcceptable, NotFound
+from werkzeug.exceptions import NotAcceptable, NotFound, Forbidden
 from werkzeug.utils import secure_filename
 from flaskdepot.extensions import db
-from flaskdepot.file.controllers import UploadForm, EvaluationForm
+from flaskdepot.file.controllers import UploadForm, EvaluationForm, EditForm
 from flaskdepot.file.models import BroadCategory, File, Comment, Vote, Download, NarrowCategory
 
 file = Blueprint("file", __name__)
@@ -58,7 +58,52 @@ def upload():
     return render_template('file/upload.html', form=form, title="Upload")
 
 
-@file.route('/<fileid>/<slug>/', methods=['GET', 'POST'])
+@file.route('/<fileid>/edit/', methods=['GET', 'POST'])
+@file.route('/<fileid>-<slug>/edit/', methods=['GET', 'POST'])
+def edit(fileid, slug=None):
+    form = EditForm()
+    _file = File.query.filter_by(id=fileid).first_or_404()
+
+    if not current_user.is_anonymous() and _file.author.id == current_user.id:
+        form.next.data = url_for('.file_one', fileid=fileid)
+        form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
+        form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
+        form.description.content = _file.description
+        form.version.content = _file.version
+        form.broad_category.data = _file.broad_category_id
+        form.narrow_category.data = _file.narrow_category_id
+
+        if form.validate_on_submit():
+            _file.description = form.description.data
+            _file.version = form.version.data
+            _file.broad_category_id = form.broad_category.data
+            _file.narrow_category_id = form.narrow_category.data
+
+            file_subdir = os.path.join(current_app.config['FILE_DIR'], _file.slug)
+            image_subdir = os.path.join(current_app.config['PREVIEW_DIR'], _file.slug)
+
+            # Slug did not change, so save in the existing directory
+            if len(form.package.data.filename) > 0:
+                _file.file_name = secure_filename(form.package.data.filename)
+                form.package.data.save(os.path.join(file_subdir, _file.file_name))
+            if len(form.image_1.data.filename) > 0:
+                _file.preview1_name = secure_filename(form.image_1.data.filename)
+                form.image_1.data.save(os.path.join(image_subdir, _file.preview1_name))
+            if len(form.image_2.data.filename) > 0:
+                _file.preview2_name = secure_filename(form.image_2.data.filename)
+                form.image_2.data.save(os.path.join(image_subdir, _file.preview2_name))
+
+            db.session.commit()
+
+            flash('File has been updated')
+            form.redirect()
+
+        return render_template('file/edit.html', form=form, fileid=fileid, title="Edit file")
+    else:
+        raise Forbidden()
+
+
+@file.route('/<fileid>-<slug>/', methods=['GET', 'POST'])
 @file.route('/<fileid>/', methods=['GET', 'POST'])
 def file_one(fileid, slug=None):
     form = EvaluationForm()

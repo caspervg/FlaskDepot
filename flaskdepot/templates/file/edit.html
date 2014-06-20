@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'upload' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <form method=post action="{{ url_for('file.edit', fileid=fileid) }}" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.package) }}
+            {{ render_field(form.image_1) }}
+            {{ render_field(form.image_2) }}
+            {{ render_field(form.version) }}
+            {{ render_field(form.description) }}
+            {{ render_field(form.broad_category) }}
+            {{ render_field(form.narrow_category) }}
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Update" class="button">
+                </div>
+            </div>
+        </form>
+        {{ flashes() }}
+    </div>
+{% endblock %}
