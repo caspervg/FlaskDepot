@@ -68,7 +68,11 @@
             <h5>Tools</h5>
             <div class="button-bar">
                 <ul class="button-group radius" id="author-buttons">
-                    <li><a href="{{ url_for('file.edit', fileid=upload.id, slug=upload.slug) }}" class="button small success">Edit File</a></li>
+                    {% if current_user.group.is_admin %}
+                        <li><a href="{{ url_for('admin.edit_file', fileid=upload.id, slug=upload.slug) }}" class="button small success">Edit File</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('file.edit', fileid=upload.id, slug=upload.slug) }}" class="button small success">Edit File</a></li>
+                    {% endif %}
                     <li><a href="#" class="button small warning">Lock File</a></li>
                     <li><a href="#" class="button small alert">Delete File</a></li>
                 </ul>

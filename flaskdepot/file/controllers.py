@@ -1,5 +1,4 @@
 from flask_wtf.file import FileField, FileAllowed, FileRequired
-from werkzeug.utils import secure_filename
 from wtforms import TextField, TextAreaField, SelectField, Form, IntegerField
 from wtforms.validators import Required, NumberRange, Length, Optional
 from flaskdepot.base.controllers import RedirectForm

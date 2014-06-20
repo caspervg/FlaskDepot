@@ -1,9 +1,12 @@
-from flask import Blueprint, abort, flash, render_template, current_app, request
+import os
+from flask import Blueprint, abort, flash, render_template, current_app, request, url_for
 from flask.ext.login import login_required, current_user
+from slugify import slugify
 from sqlalchemy import func
-from flaskdepot.admin.controllers import AdminAccountEditForm
+from werkzeug.utils import secure_filename
+from flaskdepot.admin.controllers import AdminAccountEditForm, AdminFileEditForm
 from flaskdepot.extensions import db
-from flaskdepot.file.models import Download, File, Vote, Comment
+from flaskdepot.file.models import Download, File, Vote, Comment, BroadCategory, NarrowCategory
 from flaskdepot.user.models import User, Usergroup
 from flaskdepot.utils.helper import likeable
 
@@ -93,10 +96,61 @@ def category():
     return 'Category admin'
 
 
-@admin.route('/file/<id>/edit', methods=['GET', 'POST'])
+@admin.route('/file/<fileid>/edit', methods=['GET', 'POST'])
+@admin.route('/file/<fileid>/<slug>/edit', methods=['GET', 'POST'])
 @login_required
-def edit_file(id):
-    return 'Edit file'
+def edit_file(fileid, slug=None):
+    form = AdminFileEditForm()
+    _file = File.query.filter_by(id=fileid).first_or_404()
+
+    form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
+    form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
+    form.fileid = fileid
+
+    if request.method == 'GET':
+        form.filename.data = _file.name
+        form.description.data = _file.description
+        form.version.data = _file.version
+        form.broad_category.data = _file.broad_category_id
+        form.narrow_category.data = _file.narrow_category_id
+
+    if form.validate_on_submit():
+        _file.description = form.description.data
+        _file.version = form.version.data
+        _file.broad_category_id = form.broad_category.data
+        _file.narrow_category_id = form.narrow_category.data
+
+        file_subdir = os.path.join(current_app.config['FILE_DIR'], _file.slug)
+        image_subdir = os.path.join(current_app.config['PREVIEW_DIR'], _file.slug)
+
+        if slugify(form.filename.data) != _file.slug:
+            new_file_subdir = os.path.join(current_app.config['FILE_DIR'], slugify(form.filename.data))
+            new_image_subdir = os.path.join(current_app.config['PREVIEW_DIR'], slugify(form.filename.data))
+
+            os.rename(file_subdir, new_file_subdir)
+            os.rename(image_subdir, new_image_subdir)
+            _file.name = form.filename.data
+            _file.slug = slugify(_file.name)
+
+            file_subdir = new_file_subdir
+            image_subdir = new_image_subdir
+
+        if len(form.package.data.filename) > 0:
+            _file.file_name = secure_filename(form.package.data.filename)
+            form.package.data.save(os.path.join(file_subdir, _file.file_name))
+        if len(form.image_1.data.filename) > 0:
+            _file.preview1_name = secure_filename(form.image_1.data.filename)
+            form.image_1.data.save(os.path.join(image_subdir, _file.preview1_name))
+        if len(form.image_2.data.filename) > 0:
+            _file.preview2_name = secure_filename(form.image_2.data.filename)
+            form.image_2.data.save(os.path.join(image_subdir, _file.preview2_name))
+
+        db.session.commit()
+
+        flash('File has been updated')
+        return form.redirect(url_for('file.file_one', fileid=fileid, slug=_file.slug))
+
+    return render_template('admin/file_edit.html', form=form, fileid=fileid, title="Edit file")
 
 
 @admin.route('/user/<id>/edit', methods=['GET', 'POST'])
