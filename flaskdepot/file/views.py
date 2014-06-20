@@ -60,11 +60,12 @@ def upload():
 
 @file.route('/<fileid>/edit/', methods=['GET', 'POST'])
 @file.route('/<fileid>-<slug>/edit/', methods=['GET', 'POST'])
+@login_required
 def edit(fileid, slug=None):
     form = EditForm()
     _file = File.query.filter_by(id=fileid).first_or_404()
 
-    if not current_user.is_anonymous() and _file.author.id == current_user.id:
+    if _file.author.id == current_user.id:
         form.next.data = url_for('.file_one', fileid=fileid)
         form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
         form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
