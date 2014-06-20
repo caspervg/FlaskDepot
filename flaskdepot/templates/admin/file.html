@@ -28,7 +28,7 @@
                         {% for file in files.items %}
                             <tr>
                                 <td>{{ file.id }}</td>
-                                <td><a href="{{ url_for('admin.edit_file', id=file.id) }}">{{ file.name }}</a></td>
+                                <td><a href="{{ url_for('file.file_one', fileid=file.id, slug=file.slug) }}">{{ file.name }}</a></td>
                                 <td>{{ file.author.username }}</td>
                                 <td>{{ render_boolean(file.is_locked) }}</td>
                                 <td>{{ render_boolean(file.is_deleted) }}</td>
