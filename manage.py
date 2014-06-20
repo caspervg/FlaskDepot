@@ -117,8 +117,8 @@ def initdepot(username=None, password=None, email=None):
     else:
         create_admin()
 
-    #app.logger.info("Creating sample data...")
-    #create_sample_data()
+    app.logger.info("Creating sample data...")
+    create_sample_data()
 
     app.logger.info("FlaskDepot has been successfully installed")
 
