@@ -59,7 +59,7 @@ def upload():
 
 
 @file.route('/<fileid>/edit/', methods=['GET', 'POST'])
-@file.route('/<fileid>-<slug>/edit/', methods=['GET', 'POST'])
+@file.route('/<fileid>/<slug>/edit/', methods=['GET', 'POST'])
 @login_required
 def edit(fileid, slug=None):
     form = EditForm()
@@ -69,8 +69,8 @@ def edit(fileid, slug=None):
         form.next.data = url_for('.file_one', fileid=fileid)
         form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
         form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
-        form.description.content = _file.description
-        form.version.content = _file.version
+        form.description.data = _file.description
+        form.version.data = _file.version
         form.broad_category.data = _file.broad_category_id
         form.narrow_category.data = _file.narrow_category_id
 
@@ -104,7 +104,7 @@ def edit(fileid, slug=None):
         raise Forbidden()
 
 
-@file.route('/<fileid>-<slug>/', methods=['GET', 'POST'])
+@file.route('/<fileid>/<slug>/', methods=['GET', 'POST'])
 @file.route('/<fileid>/', methods=['GET', 'POST'])
 def file_one(fileid, slug=None):
     form = EvaluationForm()
@@ -160,7 +160,8 @@ def file_all():
 
 
 @file.route('/preview/<id>/<number>/')
-def preview(id, number):
+@file.route('/preview/<id>/<slug>/<number>')
+def preview(id, number, slug=None):
     _file = File.query.filter_by(id=id).first()
     if _file:
         if int(number) == 1:
@@ -183,7 +184,8 @@ def preview(id, number):
 
 @login_required
 @file.route('/package/<id>/')
-def package(id):
+@file.route('/package/<id>/<slug>')
+def package(id, slug=None):
     _file = File.query.filter_by(id=id).first()
     if _file:
         download = Download.query.filter_by(file_id=id, user_id=current_user.id).first()
