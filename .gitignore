@@ -1,5 +1,5 @@
-*.zip
 *.db
 *.iml
 .idea
-*.jpg
+*.pyc
+out/

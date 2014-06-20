@@ -1,0 +1,13 @@
+# Ignore zip and rar files
+*.zip
+*.rar
+
+# Ignore jpg, png and gif files
+*.jpg
+*.png
+*.gif
+
+# Do not ignore the sample files
+!files/sample-file/sample-file.zip
+!images/sample-file/sample-preview1.jpg
+!images/sample-file/sample-preview2.jpg
