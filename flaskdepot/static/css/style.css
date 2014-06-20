@@ -7,6 +7,10 @@ textarea {
     background: none;
 }
 
+.no-margin {
+    margin: 0;
+}
+
 .margin-bottom {
     margin-bottom: 10px;
 }

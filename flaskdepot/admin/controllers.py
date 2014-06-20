@@ -1,5 +1,5 @@
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import SelectField, TextField, Form, TextAreaField
+from wtforms import SelectField, TextField, Form, TextAreaField, RadioField
 from wtforms.validators import Required
 from flaskdepot.base.controllers import RedirectForm
 from flaskdepot.file.models import File
@@ -63,3 +63,27 @@ class AdminFileEditForm(RedirectForm):
                 validate = False
 
         return validate
+
+
+class AdminAddCategoryForm(RedirectForm):
+    name = TextField('Name', validators=[
+        Required("Please enter a category name")
+    ])
+
+    description = TextAreaField('Description')
+
+    type = RadioField('Type', choices=[('broad', 'Broad Category'), ('narrow', 'Narrow Category')])
+
+
+class AdminRenameCategoryForm(RedirectForm):
+    name = TextField('Name', validators=[
+        Required("Please enter a category name")
+    ])
+    catid = -1
+    type = None
+
+
+class AdminDescribeCategoryForm(RedirectForm):
+    description = TextAreaField('Description')
+    catid = -1
+    type = None

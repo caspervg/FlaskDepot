@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import flashes, render_field %}
+{% set activepage = 'administration' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        {{ flashes() }}
+        <fieldset>
+            <legend>Broad Categories</legend>
+            <div class="row max-width">
+                <div class="large-centered large-12 columns">
+                    <table width="100%" style="table-layout: fixed">
+                        <thead>
+                        <tr>
+                            <th width="3%">ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Files</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cat in broad %}
+                            <tr>
+                                <td>{{ cat.id }}</td>
+                                <td>{{ cat.name }}</td>
+                                <td>{{ cat.description|striptags }}</td>
+                                <td>{{ cat.files.count() }}</td>
+                                <td>
+                                    <ul class="button-group radius">
+                                        <li>
+                                            <a href="{{ url_for('admin.delete_category', type='broad', catid=cat.id) }}" class="button tiny no-margin alert
+                                            {{ '' if cat.files.count() < 1 else 'disabled' }}">Delete</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ url_for('admin.describe_category', type='broad', catid=cat.id) }}" class="button tiny no-margin">Change description</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ url_for('admin.rename_category', type='broad', catid=cat.id) }}" class="button tiny no-margin success">Rename</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Narrow Categories</legend>
+            <div class="row max-width">
+                <div class="large-centered large-12 columns">
+                    <table width="100%" style="table-layout: fixed">
+                        <thead>
+                        <tr>
+                            <th width="3%">ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Files</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cat in narrow %}
+                            <tr>
+                                <td>{{ cat.id }}</td>
+                                <td>{{ cat.name }}</td>
+                                <td>{{ cat.description|striptags }}</td>
+                                <td>{{ cat.files.count() }}</td>
+                                <td>
+                                    <ul class="button-group radius">
+                                        <li>
+                                            <a href="{{ url_for('admin.delete_category', type='narrow', catid=cat.id) }}" class="button tiny no-margin alert
+                                            {{ '' if cat.files.count() < 1 else 'disabled' }}">Delete</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ url_for('admin.describe_category', type='narrow', catid=cat.id) }}" class="button tiny no-margin">Change description</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ url_for('admin.rename_category', type='narrow', catid=cat.id) }}" class="button tiny no-margin success">Rename</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Add category</legend>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.name) }}
+                {{ render_field(form.description) }}
+                {{ render_field(form.type) }}
+                <div class="row">
+                    <div class="large-12 large-centered columns">
+                        <button type="submit" class="button">Add category</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+    </div>
+{% endblock %}

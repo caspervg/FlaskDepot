@@ -3,8 +3,10 @@ from flask import Blueprint, abort, flash, render_template, current_app, request
 from flask.ext.login import login_required, current_user
 from slugify import slugify
 from sqlalchemy import func
-from werkzeug.utils import secure_filename
-from flaskdepot.admin.controllers import AdminAccountEditForm, AdminFileEditForm
+from werkzeug.exceptions import BadRequest
+from werkzeug.utils import secure_filename, redirect
+from flaskdepot.admin.controllers import AdminAccountEditForm, AdminFileEditForm, AdminAddCategoryForm, \
+    AdminRenameCategoryForm, AdminDescribeCategoryForm
 from flaskdepot.extensions import db
 from flaskdepot.file.models import Download, File, Vote, Comment, BroadCategory, NarrowCategory
 from flaskdepot.user.models import User, Usergroup
@@ -90,11 +92,123 @@ def file(page=1):
     return render_template('admin/file.html', files=files, users=users, title="File administration")
 
 
-@admin.route('/category', methods=['GET'])
+@admin.route('/category', methods=['GET','POST'])
 @login_required
 def category():
-    return 'Category admin'
+    broad_categories = BroadCategory.query.all()
+    narrow_categories = NarrowCategory.query.all()
+    form = AdminAddCategoryForm()
+    form.next.data = url_for('admin.category')
 
+    if form.validate_on_submit():
+        cat = None
+        if form.type.data == 'broad':
+            cat = BroadCategory()
+        elif form.type.data == 'narrow':
+            cat = NarrowCategory()
+        else:
+            raise BadRequest()
+        cat.description = form.description.data if len(form.description.data) > 0 else None
+        cat.name = form.name.data
+
+        db.session.add(cat)
+        db.session.commit()
+
+        flash('Category has been added')
+        return form.redirect()
+
+    return render_template('admin/category.html',
+                           broad=broad_categories,
+                           narrow=narrow_categories,
+                           form=form,
+                           title="Category administration")
+
+
+@admin.route('/category/delete', methods=['GET'])
+@login_required
+def delete_category():
+    _type = request.args.get('type')
+    _catid = request.args.get('catid')
+    cat = None
+
+    if _type == 'broad':
+        cat = BroadCategory.query.filter_by(id=_catid).first_or_404()
+    elif _type == 'narrow':
+        cat = NarrowCategory.query.filter_by(id=_catid).first_or_404()
+    else:
+        raise BadRequest()
+
+    if cat.files.count() > 0:
+        raise BadRequest()
+
+    db.session.delete(cat)
+    db.session.commit()
+    flash('Category has been deleted')
+    return redirect(url_for('admin.category'))
+
+
+@admin.route('/category/rename', methods=['GET', 'POST'])
+@login_required
+def rename_category():
+    _type = request.args.get('type')
+    _catid = request.args.get('catid')
+    cat = None
+
+    if _type == 'broad':
+        cat = BroadCategory.query.filter_by(id=_catid).first_or_404()
+    elif _type == 'narrow':
+        cat = NarrowCategory.query.filter_by(id=_catid).first_or_404()
+    else:
+        raise BadRequest()
+
+    form = AdminRenameCategoryForm()
+    form.next.data = url_for('admin.category')
+
+    if request.method == 'GET':
+        form.type = _type
+        form.catid = _catid
+        form.name.data = cat.name
+
+    if form.validate_on_submit():
+        cat.name = form.name.data
+
+        db.session.commit()
+        flash('Category name has been updated')
+        return form.redirect()
+
+    return render_template('admin/category_rename.html', form=form)
+
+
+
+@admin.route('/category/describe', methods=['GET', 'POST'])
+def describe_category():
+    _type = request.args.get('type')
+    _catid = request.args.get('catid')
+    cat = None
+
+    if _type == 'broad':
+        cat = BroadCategory.query.filter_by(id=_catid).first_or_404()
+    elif _type == 'narrow':
+        cat = NarrowCategory.query.filter_by(id=_catid).first_or_404()
+    else:
+        raise BadRequest()
+
+    form = AdminDescribeCategoryForm()
+    form.next.data = url_for('admin.category')
+
+    if request.method == 'GET':
+        form.type = _type
+        form.catid = _catid
+        form.description.data = cat.description if cat.description else ''
+
+    if form.validate_on_submit():
+        cat.description = form.description.data
+
+        db.session.commit()
+        flash('Category description has been updated')
+        return form.redirect()
+
+    return render_template('admin/category_describe.html', form=form)
 
 @admin.route('/file/<fileid>/edit', methods=['GET', 'POST'])
 @admin.route('/file/<fileid>/<slug>/edit', methods=['GET', 'POST'])
