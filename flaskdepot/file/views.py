@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from flask import Blueprint, render_template, flash, abort, send_from_directory, current_app, url_for
+from flask import Blueprint, render_template, flash, abort, send_from_directory, current_app, url_for, request
 from flask.ext.login import login_required, current_user
 from slugify import slugify
 from sqlalchemy import func
@@ -69,10 +69,12 @@ def edit(fileid, slug=None):
         form.next.data = url_for('.file_one', fileid=fileid)
         form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
         form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
-        form.description.data = _file.description
-        form.version.data = _file.version
-        form.broad_category.data = _file.broad_category_id
-        form.narrow_category.data = _file.narrow_category_id
+
+        if request.method == 'GET':
+            form.description.data = _file.description
+            form.version.data = _file.version
+            form.broad_category.data = _file.broad_category_id
+            form.narrow_category.data = _file.narrow_category_id
 
         if form.validate_on_submit():
             _file.description = form.description.data
