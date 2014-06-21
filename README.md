@@ -3,7 +3,7 @@ flask-depot
 Python (Flask) based file-exchange web application. Still in development.
 
 ### Live demo
-A live demo of a FlaskDepot can be found at [flaskdepot.caspervg.net](flaskdepot.caspervg.net). It is not guaranteed to be 100% up to date with the source code at all times, but I try to update it regularly. 
+A live demo of a FlaskDepot can be found at [flaskdepot.caspervg.net](http://flaskdepot.caspervg.net). It is not guaranteed to be 100% up to date with the source code at all times, but I try to update it regularly. 
 
 ### Current features
 * Admin panel with full control over users, groups, categories and files
