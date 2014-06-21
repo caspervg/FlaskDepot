@@ -56,7 +56,7 @@ class Usergroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100))
 
-    users = db.relationship('User', backref='group')
+    users = db.relationship('User', backref='group', lazy='dynamic')
 
     is_default = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
