@@ -10,14 +10,17 @@
             </div>
         </div>
         <div class="row">
-            <div class="large-4 columns">
-                <a href="{{ url_for('admin.user') }}" class="button">User Administration</a>
+            <div class="large-3 columns">
+                <a href="{{ url_for('admin.user') }}" class="button"><i class="fi-torso"></i> User Admin</a>
             </div>
-            <div class="large-4 columns">
-                <a href="{{ url_for('admin.file') }}" class="button">File Administration</a>
+            <div class="large-3 columns">
+                <a href="{{ url_for('admin.file') }}" class="button"><i class="fi-folder-add"></i> File Admin</a>
             </div>
-            <div class="large-4 columns">
-                <a href="{{ url_for('admin.category') }}" class="button">Category Administration</a>
+            <div class="large-3 columns">
+                <a href="{{ url_for('admin.category') }}" class="button"><i class="fi-list-bullet"></i> Category Admin</a>
+            </div>
+            <div class="large-3 columns">
+                <a href="{{ url_for('admin.usergroup') }}" class="button"><i class="fi-torsos-all"></i> Usergroup Admin</a>
             </div>
         </div>
 
