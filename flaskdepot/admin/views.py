@@ -6,7 +6,7 @@ from sqlalchemy import func
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import secure_filename, redirect
 from flaskdepot.admin.controllers import AdminAccountEditForm, AdminFileEditForm, AdminAddCategoryForm, \
-    AdminRenameCategoryForm, AdminDescribeCategoryForm
+    AdminRenameCategoryForm, AdminDescribeCategoryForm, AdminAddUsergroupForm, AdminRenameUsergroupForm
 from flaskdepot.extensions import db
 from flaskdepot.file.models import Download, File, Vote, Comment, BroadCategory, NarrowCategory
 from flaskdepot.user.models import User, Usergroup
@@ -92,7 +92,89 @@ def file(page=1):
     return render_template('admin/file.html', files=files, users=users, title="File administration")
 
 
-@admin.route('/category', methods=['GET','POST'])
+@admin.route('/usergroup', methods=['GET', 'POST'])
+@login_required
+def usergroup():
+    groups = Usergroup.query.all()
+    form = AdminAddUsergroupForm()
+    form.next.data = url_for('admin.usergroup')
+
+    if form.validate_on_submit():
+        group = Usergroup()
+        group.name = form.name.data
+        group.is_banned = form.is_banned.data
+        group.is_default = form.is_default.data
+        group.is_admin = form.is_admin.data
+        group.is_uploader = form.is_uploader.data
+
+        db.session.add(group)
+        db.session.commit()
+        flash('Usergroup has been added')
+
+        return form.redirect()
+
+    return render_template('admin/usergroup.html', groups=groups, form=form, title="Usergroup administration")
+
+
+@admin.route('/usergroup/<groupid>/switch', methods=['GET'])
+@login_required
+def switch_usergroup(groupid):
+    group = Usergroup.query.filter_by(id=groupid).first_or_404()
+    _type = request.args.get('type')
+
+    if _type == 'banned':
+        group.is_banned = False if group.is_banned else True
+    elif _type == 'default':
+        group.is_default = False if group.is_default else True
+    elif _type == 'admin':
+        group.is_admin = False if group.is_admin else True
+    elif _type == 'uploader':
+        group.is_uploader = False if group.is_uploader else True
+    else:
+        raise BadRequest()
+
+    db.session.commit()
+    flash('Usergroup has been updated')
+
+    return redirect(url_for('admin.usergroup'))
+
+
+@admin.route('/usergroup/<groupid>/rename', methods=['GET', 'POST'])
+@login_required
+def rename_usergroup(groupid):
+    group = Usergroup.query.filter_by(id=groupid).first_or_404()
+
+    form = AdminRenameUsergroupForm()
+    form.next.data = url_for('admin.usergroup')
+
+    if request.method == 'GET':
+        form.name.data = group.name
+
+    if form.validate_on_submit():
+        group.name = form.name.data
+
+        db.session.commit()
+
+        flash('Usergroup name has been updated')
+        return form.redirect()
+
+    return render_template('admin/usergroup_rename.html', form=form)
+
+
+@admin.route('/usergroup/<groupid>/delete', methods=['GET'])
+def delete_usergroup(groupid):
+    group = Usergroup.query.filter_by(id=groupid).first_or_404()
+    if group.users.count() > 0:
+        raise BadRequest()
+    else:
+        db.session.delete(group)
+        db.session.commit()
+
+        flash('Usergroup has been removed')
+        return redirect(url_for('admin.usergroup'))
+
+
+@admin.route('/category', methods=['GET', 'POST'])
 @login_required
 def category():
     broad_categories = BroadCategory.query.all()

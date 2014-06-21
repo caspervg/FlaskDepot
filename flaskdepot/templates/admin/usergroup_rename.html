@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import render_field, flashes %}
+{% set activepage = 'administration' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {{ render_field(form.name) }}
+            <div class="row">
+                <div class="large-12 columns">
+                    <input type="submit" value="Rename usergroup" class="button">
+                </div>
+            </div>
+        </form>
+        {{ flashes() }}
+    </div>
+{% endblock %}

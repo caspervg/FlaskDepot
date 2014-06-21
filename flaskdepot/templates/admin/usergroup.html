@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import flashes, render_field, render_small_field, render_switch_boolean %}
+{% set activepage = 'administration' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        {{ flashes() }}
+        <fieldset>
+            <legend>Usergroups</legend>
+            <div class="row max-width">
+                <div class="large-centered large-12 columns">
+                    <table width="100%" style="table-layout: fixed">
+                        <thead>
+                        <tr>
+                            <th width="3%">ID</th>
+                            <th>Name</th>
+                            <th>Users</th>
+                            <th>Default</th>
+                            <th>Banned</th>
+                            <th>Admin</th>
+                            <th>Uploader</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for group in groups %}
+                            <tr>
+                                <td>{{ group.id }}</td>
+                                <td>{{ group.name }}</td>
+                                <td>{{ group.users.count() }}</td>
+                                <td>{{ render_switch_boolean(group.is_default, 'admin.switch_usergroup', groupid=group.id, type='default') }}</td>
+                                <td>{{ render_switch_boolean(group.is_banned, 'admin.switch_usergroup', groupid=group.id, type='banned') }}</td>
+                                <td>{{ render_switch_boolean(group.is_admin, 'admin.switch_usergroup', groupid=group.id, type='admin') }}</td>
+                                <td>{{ render_switch_boolean(group.is_uploader, 'admin.switch_usergroup', groupid=group.id, type='uploader') }}</td>
+                                <td>
+                                    <ul class="button-group radius">
+                                        <li>
+                                            <a href="{{ url_for('admin.delete_usergroup', groupid=group.id) }}" class="button tiny no-margin alert
+                                            {{ '' if group.users.count() < 1 else 'disabled' }}">Delete</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ url_for('admin.rename_usergroup', groupid=group.id) }}" class="button tiny no-margin success">Rename</a>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Add usergroup</legend>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.name) }}
+                <div class="row">
+                    {{ render_small_field(form.is_default, 3) }}
+                    {{ render_small_field(form.is_banned, 3) }}
+                    {{ render_small_field(form.is_admin, 3) }}
+                    {{ render_small_field(form.is_uploader, 3) }}
+                </div>
+                <div class="row">
+                    <div class="large-12 large-centered columns">
+                        <button type="submit" class="button">Add usergroup</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+    </div>
+{% endblock %}
