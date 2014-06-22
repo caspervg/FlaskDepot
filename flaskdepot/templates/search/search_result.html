@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import flashes, render_field %}
+{% set activepage = 'search' %}
+
+{% block content %}
+    <style>
+        .preview-img {
+            max-width: {{ config['PREVIEW_MAX_IMGSIZE'][0] }}px;
+        }
+    </style>
+    <div class="panel clearfix">
+        {{ flashes() }}
+        <div class="row">
+            <div class="large-12 columns">
+                <h3>Results</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="large-12 columns">
+                <table width="100%">
+                    {% for result in results.items %}
+                        <tr>
+                            <td>
+                                <table width="100%" style="table-layout: fixed">
+                                    <tr>
+                                        <td rowspan="2" style="width:260px">
+                                            <img src="{{ url_for('file.preview', id=result.id, number=1) }}" alt="preview image 1 for {{ result.name }}" class="preview-img"/>
+                                        </td>
+                                        <td style="max-height: 15%; height: 1rem">
+                                            <strong>{{ result.name|title }} by {{ result.author.username }}</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="min-height: 85%">
+                                            {{ result.description|striptags|truncate(250) }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

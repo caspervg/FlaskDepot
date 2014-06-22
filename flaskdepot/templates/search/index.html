@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% from "_helpers.html" import flashes, render_field %}
+{% set activepage = 'search' %}
+
+{% block content %}
+    <div class="panel clearfix">
+        {{ flashes() }}
+        <fieldset>
+            <legend>Search files</legend>
+            <form method="post">
+                {{ form.hidden_tag() }}
+                {{ render_field(form.keyword) }}
+                {{ render_field(form.author) }}
+                {{ render_field(form.broad_category) }}
+                {{ render_field(form.narrow_category) }}
+                {{ render_field(form.exclude_locked) }}
+                <div class="row">
+                    <div class="large-12 large-centered columns">
+                        <button type="submit" class="button">Search files</button>
+                    </div>
+                </div>
+            </form>
+        </fieldset>
+    </div>
+{% endblock %}
