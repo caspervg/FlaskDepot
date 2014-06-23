@@ -15,6 +15,7 @@ def register():
         return redirect(url_for('base.index'))
 
     form = RegistrationForm()
+    form.next.data = url_for('base.index')
 
     if form.validate_on_submit():
         user = User()
@@ -68,8 +69,8 @@ def logout():
 @login_required
 def user_one(id):
     if current_user.group.is_admin or current_user.id == int(id):
-        user = User.query.filter_by(id=id).first()
-        return render_template('user/profile.html', user=user, title=u"Profile for {0}".format(user.username))
+        _user = User.query.filter_by(id=id).first()
+        return render_template('user/profile.html', user=_user, title=u"Profile for {0}".format(_user.username))
     else:
         return 'You cannot access this page'
 
@@ -92,7 +93,7 @@ def edit_user(id):
 
         return render_template('user/edit.html', form=form, title=u"Edit profile for {0}".format(_user.username), user=_user)
     else:
-        return 'You cannot access this page'
+        abort(403)
 
 
 @user.route('/<id>/delete/', methods=['GET', 'POST'])
@@ -103,6 +104,7 @@ def delete_user(id):
     else:
         _user = User.query.filter_by(id=id).first()
         form = AccountDeleteForm()
+        form.next.data = url_for('.user_one', id=id)
 
         if form.validate_on_submit():
             if _user.username == form.username.data:
