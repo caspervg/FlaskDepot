@@ -55,7 +55,7 @@ def create_sample_data():
     _file = File(name=u'Sample file', description=u'This is a sample file. You can remove it.', version=u'1.0',
                  author=user_1, num_views=3, file_name='sample-file.zip', preview1_name='sample-preview1.jpg',
                  preview2_name='sample-preview2.jpg', broad_category=broadcat, narrow_category=narrwcat,
-                 slug=slugify('Sample file'))
+                 slug=slugify(u'Sample file'))
     db.session.add(_file)
 
     db.session.commit()
