@@ -206,6 +206,8 @@ def package(id, slug=None):
             db.session.add(download)
             db.session.commit()
 
-        return send_from_directory(os.path.join(current_app.config['FILE_DIR'], _file.slug), _file.file_name, as_attachment=True)
+        return send_from_directory(os.path.join(current_app.config['FILE_DIR'], _file.slug),
+                                   _file.file_name,
+                                   as_attachment=True)
     else:
         raise NotFound()
