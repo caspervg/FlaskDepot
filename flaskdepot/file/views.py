@@ -19,6 +19,7 @@ def upload():
     form = UploadForm()
     form.broad_category.choices = [(cat.id, cat.name) for cat in BroadCategory.query.order_by('name')]
     form.narrow_category.choices = [(cat.id, cat.name) for cat in NarrowCategory.query.order_by('name')]
+    form.next.data = url_for('base.index')
 
     if form.validate_on_submit():
         new_file = File()
@@ -54,6 +55,7 @@ def upload():
         db.session.commit()
 
         flash('File has been uploaded')
+        return form.redirect()
 
     return render_template('file/upload.html', form=form, title="Upload")
 
@@ -204,6 +206,6 @@ def package(id, slug=None):
             db.session.add(download)
             db.session.commit()
 
-        return send_from_directory(os.path.join(current_app.config['FILE_DIR'], _file.slug), _file.file_name)
+        return send_from_directory(os.path.join(current_app.config['FILE_DIR'], _file.slug), _file.file_name, as_attachment=True)
     else:
         raise NotFound()
