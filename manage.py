@@ -11,19 +11,19 @@ import sys
 
 from flask import current_app
 from sqlalchemy.exc import IntegrityError, OperationalError
-from flask.ext.script import (Manager, Shell, Server, prompt, prompt_pass,
-                              prompt_bool)
+from flask.ext.script import (Manager, Shell, Server, prompt, prompt_bool)
 from flask.ext.migrate import MigrateCommand
+
 from flaskdepot.app import create_app
 from flaskdepot.extensions import db
 from flaskdepot.utils.populate import create_default_groups, create_admin_user, create_normal_user, create_sample_data
 
 # Use the development configuration if available
-from flaskdepot.user.models import Usergroup
 
 try:
     from flaskdepot.configs.development import DevelopmentConfig as Config
-except ImportError:
+except ImportError as error:
+    print(error)
     from flaskdepot.configs.default import DefaultConfig as Config
 
 app = create_app(Config)

@@ -4,12 +4,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 
 class User(db.Model):
-    __tablename__ = 'fd_users'
+    __tablename__ = 'person'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.Unicode(25), unique=True)
 
-    group_id = db.Column(db.Integer, db.ForeignKey('fd_usergroups.id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('usergroup.id'), nullable=False)
 
     created_on = db.Column(db.DateTime, default=datetime.now())
     created_ip = db.Column(db.String(16))
@@ -51,7 +51,7 @@ class User(db.Model):
 
 
 class Usergroup(db.Model):
-    __tablename__ = 'fd_usergroups'
+    __tablename__ = 'usergroup'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(100))
