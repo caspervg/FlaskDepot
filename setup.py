@@ -34,6 +34,7 @@ setup(
         'alembic==0.6.3',
         'slugify',
         'Flask-WhooshAlchemy',
+        'Flask-Bcrypt'
     ],
     dependency_links=[
         'https://github.com/miguelgrinberg/Flask-WhooshAlchemy/tarball/master#egg=Flask-WhooshAlchemy',

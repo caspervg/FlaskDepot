@@ -12,6 +12,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.mail import Mail
 from flask.ext.migrate import Migrate
+from flask.ext.bcrypt import Bcrypt
 
 # Database
 db = SQLAlchemy()
@@ -24,3 +25,6 @@ mail = Mail()
 
 # Migrations
 migrate = Migrate()
+
+# Bcrypt
+bcrypt = Bcrypt()

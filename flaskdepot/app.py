@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flaskdepot.extensions import db, login_manager, mail, migrate
+from flaskdepot.extensions import db, login_manager, mail, migrate, bcrypt
 from flaskdepot.utils.helper import url_for
 
 
@@ -29,6 +29,7 @@ def configure_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+    bcrypt.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
